@@ -11,10 +11,10 @@ def get_cache_path():
 
     if system == "Linux" or system == "Darwin":
         user_home = os.path.expanduser("~")
-        cache_dir = os.path.join(user_home, ".cache", "codeqa")
+        cache_dir = os.path.join(user_home, ".cache", "codeqai")
     elif system == "Windows":
         user_home = os.path.expanduser("~")
-        cache_dir = os.path.join(user_home, "AppData", "Local", "codeqa")
+        cache_dir = os.path.join(user_home, "AppData", "Local", "codeqai")
     else:
         raise NotImplementedError(f"Unsupported platform: {system}")
 
@@ -32,10 +32,10 @@ def get_config_path():
 
     if system == "Linux" or system == "Darwin":
         user_home = os.path.expanduser("~")
-        config_dir = os.path.join(user_home, ".config", "codeqa")
+        config_dir = os.path.join(user_home, ".config", "codeqai")
     elif system == "Windows":
         user_home = os.path.expanduser("~")
-        config_dir = os.path.join(user_home, "AppData", "Roaming", "codeqa")
+        config_dir = os.path.join(user_home, "AppData", "Roaming", "codeqai")
     else:
         raise NotImplementedError(f"Unsupported platform: {system}")
 

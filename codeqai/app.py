@@ -4,10 +4,11 @@ from langchain.chains import ConversationalRetrievalChain
 from langchain.chat_models import ChatOpenAI
 from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.memory import ConversationSummaryMemory
+from yaspin import yaspin
 
 from codeqai import codeparser, repo
 from codeqai.config import (create_cache_dir, create_config, get_cache_path,
-                        load_config)
+                            load_config)
 from codeqai.vector_store import VectorStore
 
 
@@ -46,7 +47,29 @@ def run():
     qa = ConversationalRetrievalChain.from_llm(
         llm, retriever=vector_store.retriever, memory=memory
     )
+    while True:
+        question = input("🤖 Ask me anything about the codebase: ")
 
-    question = "What is TreesitterRegistry doing?"
-    result = qa(question)
-    print(result)
+        spinner = yaspin(text=f"🤖 Processing question...")
+        spinner.start()
+
+        result = qa(question)
+
+        spinner.stop()
+        print(result["answer"])
+
+        choice = (
+            input("Do you want to (C)ontinue chat, (R)eset chat or (E)xit [C]?")
+            .strip()
+            .lower()
+        )
+
+        if choice == "" or choice == "c":
+            continue
+        elif choice == "e":
+            break
+        elif choice == "r":
+            print("Resetting chat...")
+            memory.clear()
+        else:
+            print("Invalid choice. Please enter 'C', 'E', or 'R'.")

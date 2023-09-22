@@ -1,5 +1,7 @@
 import os
 
+import langchain.text_splitter as text_splitter
+
 from codeqai.constants import Language
 
 
@@ -20,7 +22,6 @@ def get_programming_language(file_extension: str) -> Language:
         ".ts": Language.TYPESCRIPT,
         ".java": Language.JAVA,
         ".kt": Language.KOTLIN,
-        ".lua": Language.LUA,
         ".rs": Language.RUST,
         ".go": Language.GO,
     }
@@ -39,3 +40,25 @@ def get_file_extension(file_name: str) -> str:
 
     """
     return os.path.splitext(file_name)[-1]
+
+
+def get_langchain_language(language: Language) -> text_splitter.Language | None:
+    if language == Language.PYTHON:
+        return text_splitter.Language.PYTHON
+    elif language == Language.JAVASCRIPT:
+        return text_splitter.Language.JS
+    elif language == Language.TYPESCRIPT:
+        # TODO support typescript
+        return text_splitter.Language.JS
+    elif language == Language.JAVA:
+        return text_splitter.Language.JAVA
+    elif language == Language.RUST:
+        return text_splitter.Language.RUST
+    elif language == Language.GO:
+        return text_splitter.Language.GO
+
+    return None
+
+
+def get_bold_text(text):
+    return f"\033[01m{text}\033[0m"

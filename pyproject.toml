@@ -16,7 +16,6 @@ gitpython = "^3.1.36"
 langchain = "^0.0.297"
 openai = "^0.28.0"
 pyyaml = "^6.0.1"
-faiss-cpu = "^1.7.4"
 tree-sitter = "^0.20.2"
 tree-sitter-languages = "^1.7.0"
 

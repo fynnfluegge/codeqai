@@ -13,7 +13,7 @@ def parse_code_files(code_files: list[str]) -> list[Document]:
     source_code_documents, docstring_documents = [], []
     source_code_splitter = None
     docstring_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=512, chunk_overlap=128
+        chunk_size=1024, chunk_overlap=128
     )
     for code_file in code_files:
         with open(code_file, "r") as file:
@@ -31,7 +31,7 @@ def parse_code_files(code_files: list[str]) -> list[Document]:
             if langchain_language:
                 source_code_splitter = RecursiveCharacterTextSplitter.from_language(
                     language=langchain_language,
-                    chunk_size=512,
+                    chunk_size=1024,
                     chunk_overlap=128,
                 )
 

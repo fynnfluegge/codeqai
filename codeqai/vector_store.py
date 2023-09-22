@@ -25,10 +25,13 @@ class VectorStore:
             self.db.save_local(index_name=self.name, folder_path=get_cache_path())
         self.retriever = self.db.as_retriever(search_type="mmr", search_kwargs={"k": 8})
 
+    def similarity_search(self, query: str):
+        return self.db.similarity_search(query, k=4)
+
     def install_faiss(self):
         try:
-            from faiss import (FAISS_VERSION_MAJOR,  # noqa: F401
-                               FAISS_VERSION_MINOR)
+            from faiss import FAISS_VERSION_MAJOR  # noqa: F401
+            from faiss import FAISS_VERSION_MINOR
         except:  # noqa: E722
             question = [
                 inquirer.Confirm(

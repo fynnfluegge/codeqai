@@ -62,28 +62,55 @@ def create_config():
         inquirer.Confirm(
             "confirm", message="Do you want to use local models?", default=False
         ),
-        inquirer.List(
-            "embeddings",
-            message="Which embeddings do you want to use?",
-            choices=["USE", "BERT"],
-            default="USE",
-        ),
-        inquirer.List(
-            "llm",
-            message="Which LLM do you want to use?",
-            choices=["GPT-2", "GPT-3"],
-            default="GPT-2",
-        ),
     ]
+
+    confirm = inquirer.prompt(questions)
+
+    if confirm and confirm["confirm"]:
+        questions = [
+            inquirer.List(
+                "embeddings",
+                message="Which local embeddings model do you want to use?",
+                choices=[
+                    "SentenceTransformers-all-mpnet-base-v2",
+                    "Instructor-Large",
+                    "Ollama",
+                ],
+                default="SentenceTransformers-all-mpnet-base-v2",
+            ),
+            inquirer.List(
+                "llm",
+                message="Which local LLM do you want to use?",
+                choices=["Llamacpp", "Ollama", "Huggingface"],
+                default="Llamacpp",
+            ),
+        ]
+    else:
+        questions = [
+            inquirer.List(
+                "embeddings",
+                message="Which embeddings do you want to use?",
+                choices=["OpenAI-text-embedding-ada-002", "Azure-OpenAI"],
+                default="OpenAI-text-embedding-ada-002",
+            ),
+            inquirer.List(
+                "llm",
+                message="Which LLM do you want to use?",
+                choices=["GPT-3.5-Turbo", "GPT-4"],
+                default="GPT-3.5-Turbo",
+            ),
+        ]
 
     answers = inquirer.prompt(questions)
 
-    if answers:
+    if confirm and answers:
         config = {
-            "local": answers["confirm"],
+            "local": confirm["confirm"],
             "embeddings": answers["embeddings"],
             "llm": answers["llm"],
         }
         save_config(config)
 
         return config
+
+    return {}

@@ -10,11 +10,8 @@ from codeqai.treesitter.treesitter import Treesitter, TreesitterMethodNode
 
 
 def parse_code_files(code_files: list[str]) -> list[Document]:
-    source_code_documents, docstring_documents = [], []
-    source_code_splitter = None
-    docstring_splitter = RecursiveCharacterTextSplitter(
-        chunk_size=1024, chunk_overlap=128
-    )
+    documents = []
+    code_splitter = None
     for code_file in code_files:
         with open(code_file, "r") as file:
             file_bytes = file.read().encode()
@@ -29,9 +26,9 @@ def parse_code_files(code_files: list[str]) -> list[Document]:
             langchain_language = utils.get_langchain_language(programming_language)
 
             if langchain_language:
-                source_code_splitter = RecursiveCharacterTextSplitter.from_language(
+                code_splitter = RecursiveCharacterTextSplitter.from_language(
                     language=langchain_language,
-                    chunk_size=1024,
+                    chunk_size=512,
                     chunk_overlap=128,
                 )
 
@@ -42,39 +39,22 @@ def parse_code_files(code_files: list[str]) -> list[Document]:
             for node in treesitterNodes:
                 method_source_code = node.method_source_code
                 filename = os.path.basename(code_file)
-                if programming_language == Language.PYTHON:
-                    docstring_pattern = r"(\'\'\'(.*?)\'\'\'|\"\"\"(.*?)\"\"\")"
-                    method_source_code = re.sub(
-                        docstring_pattern, "", node.method_source_code, flags=re.DOTALL
-                    )
-                source_code_documents.append(
-                    Document(
-                        page_content=method_source_code,
+
+                if node.doc_comment and programming_language != Language.PYTHON:
+                    method_source_code = node.doc_comment + "\n" + method_source_code
+
+                splitted_documents = [method_source_code]
+                if code_splitter:
+                    splitted_documents = code_splitter.split_text(method_source_code)
+
+                for splitted_document in splitted_documents:
+                    document = Document(
+                        page_content=splitted_document,
                         metadata={
-                            "file_name": filename,
+                            "filename": filename,
                             "method_name": node.name,
                         },
                     )
-                )
-                if node.doc_comment:
-                    docstring_documents.append(
-                        Document(
-                            page_content=node.doc_comment,
-                            metadata={
-                                "file_name": filename,
-                                "method_name": node.name,
-                            },
-                        )
-                    )
+                    documents.append(document)
 
-    splitted_source_code_documents = source_code_documents
-    if source_code_splitter:
-        splitted_source_code_documents = source_code_splitter.split_documents(
-            source_code_documents
-        )
-
-    splitted_docstring_documents = docstring_splitter.split_documents(
-        docstring_documents
-    )
-
-    return splitted_source_code_documents + splitted_docstring_documents
+    return documents

@@ -30,13 +30,12 @@ class VectorStore:
 
     def install_faiss(self):
         try:
-            from faiss import FAISS_VERSION_MAJOR  # noqa: F401
-            from faiss import FAISS_VERSION_MINOR
-        except:  # noqa: E722
+            import faiss
+        except ImportError:
             question = [
                 inquirer.Confirm(
                     "confirm",
-                    message=f"{utils.get_bold_text('FAISS')} is not found in this python environment. Do you want to install it now?",
+                    message=f"{utils.get_bold_text('FAISS')} not found in this python environment. Do you want to install it now?",
                     default=True,
                 ),
             ]

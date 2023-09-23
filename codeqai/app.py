@@ -3,12 +3,14 @@ import os
 
 from langchain.chains import ConversationalRetrievalChain
 from langchain.chat_models import ChatOpenAI
-from langchain.embeddings.openai import OpenAIEmbeddings
 from langchain.memory import ConversationSummaryMemory
 from yaspin import yaspin
 
 from codeqai import codeparser, repo
-from codeqai.config import create_cache_dir, create_config, get_cache_path, load_config
+from codeqai.config import (create_cache_dir, create_config, get_cache_path,
+                            load_config)
+from codeqai.constants import EmbeddingsModel
+from codeqai.embeddings import Embeddings
 from codeqai.vector_store import VectorStore
 
 
@@ -25,7 +27,7 @@ def run():
         create_config()
 
     # load config
-    config = None
+    config = {}
     try:
         config = load_config()
     except FileNotFoundError:
@@ -36,6 +38,11 @@ def run():
     # init cache
     create_cache_dir()
 
+    embeddings_model = Embeddings(
+        local=True,
+        model=EmbeddingsModel[config["embeddings"].upper().replace("-", "_")],
+    )
+
     # check if faiss.index exists
     if not os.path.exists(os.path.join(get_cache_path(), f"{repo_name}.index")):
         # sync repo
@@ -43,13 +50,11 @@ def run():
         documents = codeparser.parse_code_files(files)
         vector_store = VectorStore(
             repo_name,
-            OpenAIEmbeddings(client=None, model="text-search-ada-doc-001"),
+            embeddings=embeddings_model.embeddings,
             documents=documents,
         )
     else:
-        vector_store = VectorStore(
-            repo_name, OpenAIEmbeddings(client=None, model="text-search-ada-doc-001")
-        )
+        vector_store = VectorStore(repo_name, embeddings=embeddings_model.embeddings)
 
     llm = ChatOpenAI(temperature=0.9, max_tokens=2048, model="gpt-3.5-turbo")
     memory = ConversationSummaryMemory(
@@ -68,12 +73,9 @@ def run():
             similarity_result = vector_store.similarity_search(search_pattern)
             spinner.stop()
             for doc in similarity_result:
-                # print(doc.metadata["file_name"])
-                # print(doc.metadata["method_name"])
-                # print(doc.page_content)
-                print(doc)
+                print(doc.page_content)
 
-            choice = input("(C)ontinue search or (E)xit [C]?").strip().lower()
+            choice = input("[?] (C)ontinue search or (E)xit [C]:").strip().lower()
 
         elif args.action == "chat":
             question = input("🤖 Ask me anything about the codebase: ")
@@ -84,7 +86,9 @@ def run():
             print(result["answer"])
 
             choice = (
-                input("(C)ontinue chat, (R)eset chat or (E)xit [C]?").strip().lower()
+                input("[?] (C)ontinue chat, (R)eset chat or (E)xit [C]:")
+                .strip()
+                .lower()
             )
 
             if choice == "r":

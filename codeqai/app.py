@@ -7,7 +7,7 @@ from rich.console import Console
 from rich.syntax import Syntax
 from yaspin import yaspin
 
-from codeqai import codeparser, repo
+from codeqai import codeparser, repo, utils
 from codeqai.config import (create_cache_dir, create_config, get_cache_path,
                             load_config)
 from codeqai.constants import EmbeddingsModel, LllmHost
@@ -47,17 +47,25 @@ def run():
     )
 
     # check if faiss.index exists
-    if not os.path.exists(os.path.join(get_cache_path(), f"{repo_name}.index")):
+    if not os.path.exists(os.path.join(get_cache_path(), f"{repo_name}.faiss")):
         # sync repo
+        spinner = yaspin(text="🔧 Parsing codebase...", color="green")
         files = repo.load_files()
         documents = codeparser.parse_code_files(files)
+        spinner.stop()
+        spinner = yaspin(text="💾 Indexing vector store...", color="green")
+        spinner.start()
         vector_store = VectorStore(
             repo_name,
             embeddings=embeddings_model.embeddings,
             documents=documents,
         )
+        spinner.stop()
     else:
+        spinner = yaspin(text="💾 Loading vector store...", color="green")
+        spinner.start()
         vector_store = VectorStore(repo_name, embeddings=embeddings_model.embeddings)
+        spinner.stop()
 
     llm = LLM(
         llm_host=LllmHost[config["llm-host"].upper().replace("-", "_")],
@@ -73,14 +81,17 @@ def run():
     while True:
         choice = None
         if args.action == "search":
-            search_pattern = input("🤖 Enter a search pattern: ")
+            search_pattern = input("🔎 Enter a search pattern: ")
             spinner = yaspin(text="🤖 Processing...", color="green")
             spinner.start()
             similarity_result = vector_store.similarity_search(search_pattern)
             spinner.stop()
             for doc in similarity_result:
+                language = utils.get_programming_language(
+                    utils.get_file_extension(doc.metadata["filename"])
+                )
                 syntax = Syntax(
-                    doc.page_content, "python", theme="monokai", line_numbers=True
+                    doc.page_content, language.value, theme="monokai", line_numbers=True
                 )
                 console = Console()
                 console.print(syntax)
@@ -88,7 +99,7 @@ def run():
             choice = input("[?] (C)ontinue search or (E)xit [C]:").strip().lower()
 
         elif args.action == "chat":
-            question = input("🤖 Ask me anything about the codebase: ")
+            question = input("💬 Ask anything about the codebase: ")
             spinner = yaspin(text="🤖 Processing...", color="green")
             spinner.start()
             result = qa(question)
@@ -102,8 +113,8 @@ def run():
             )
 
             if choice == "r":
-                print("Resetting chat...")
                 memory.clear()
+                print("Chat history cleared.")
 
         if choice == "" or choice == "c":
             continue

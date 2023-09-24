@@ -72,16 +72,19 @@ def create_config():
                 "embeddings",
                 message="Which local embeddings model do you want to use?",
                 choices=[
-                    "SentenceTransformers-all-mpnet-base-v2",
                     "Instructor-Large",
-                    "Ollama",
+                    "SentenceTransformers-all-mpnet-base-v2",
+                    "SentenceTransformers-all-MiniLM-L6-v2",
                 ],
-                default="SentenceTransformers-all-mpnet-base-v2",
+                default="Instructor-Large",
             ),
             inquirer.List(
-                "llm",
-                message="Which local LLM do you want to use?",
-                choices=["Llamacpp", "Ollama", "Huggingface"],
+                "llm-host",
+                message="Which local LLM host do you want to use?",
+                choices=[
+                    "Llamacpp",
+                    "Ollama",
+                ],
                 default="Llamacpp",
             ),
         ]
@@ -89,15 +92,17 @@ def create_config():
         questions = [
             inquirer.List(
                 "embeddings",
-                message="Which embeddings do you want to use?",
+                message="Which remote embeddings do you want to use?",
                 choices=["OpenAI-text-embedding-ada-002", "Azure-OpenAI"],
                 default="OpenAI-text-embedding-ada-002",
             ),
             inquirer.List(
-                "llm",
-                message="Which LLM do you want to use?",
-                choices=["GPT-3.5-Turbo", "GPT-4"],
-                default="GPT-3.5-Turbo",
+                "llm-host",
+                message="Which remote LLM do you want to use?",
+                choices=[
+                    "OpenAI" "Azure-OpenAI",
+                ],
+                default="OpenAI",
             ),
         ]
 
@@ -107,8 +112,55 @@ def create_config():
         config = {
             "local": confirm["confirm"],
             "embeddings": answers["embeddings"],
-            "llm": answers["llm"],
+            "llm-host": answers["llm-host"],
         }
+        if answers["embeddings"] == "Azure-OpenAI":
+            # TODO add azure config
+            exit("Azure-OpenAI not implemented yet.")
+
+        if answers["llm-host"] == "Llamacpp":
+            questions = [
+                inquirer.Text(
+                    "chat-model",
+                    message="Please enter the path to the LLM model.",
+                    default="",
+                ),
+            ]
+        elif answers["llm-host"] == "Ollama":
+            questions = [
+                inquirer.List(
+                    "chat-model",
+                    message="Which Ollama chat model do you want to use?",
+                    choices=[
+                        "llama2",
+                        "llama2:13b",
+                        "llama2:70b",
+                        "codellama",
+                    ],
+                    default="gpt-3.5-turbo",
+                ),
+            ]
+        elif answers["llm-host"] == "Azure-OpenAI":
+            # TODO add azure config
+            exit("Azure-OpenAI not implemented yet.")
+        elif answers["llm-host"] == "OpenAI":
+            questions = [
+                inquirer.List(
+                    "chat-model",
+                    message="Which OpenAI chat model do you want to use?",
+                    choices=[
+                        "gpt-3.5-turbo",
+                        "gpt-3.5-turbo-16k",
+                        "gpt-4",
+                    ],
+                    default="gpt-3.5-turbo",
+                ),
+            ]
+
+        answers = inquirer.prompt(questions)
+        if answers and answers["chat-model"]:
+            config["chat-model"] = answers["chat-model"]
+
         save_config(config)
 
         return config

@@ -18,6 +18,7 @@ openai = "^0.28.0"
 pyyaml = "^6.0.1"
 tree-sitter = "^0.20.2"
 tree-sitter-languages = "^1.7.0"
+rich = "^13.5.3"
 
 [tool.poetry.scripts]
 codeqai = "codeqai.__main__:main"

@@ -11,31 +11,30 @@ class Embeddings:
     def __init__(
         self, local=False, model=EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002
     ):
-        self.model = model
-
         if not local:
             if model == EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002:
                 self.embeddings = OpenAIEmbeddings(
                     client=None, model="text_embedding_ada_002"
                 )
         else:
-            if model == EmbeddingsModel.OLLAMA:
-                pass
-            else:
-                try:
-                    import sentence_transformers  # noqa: F401
-                except ImportError:
-                    self._install_sentence_transformers()
+            try:
+                import sentence_transformers  # noqa: F401
+            except ImportError:
+                self._install_sentence_transformers()
 
-                if model == EmbeddingsModel.SENTENCETRANSFORMERS_ALL_MPNET_BASE_V2:
-                    self.embeddings = HuggingFaceEmbeddings()
-                elif model == EmbeddingsModel.INSTRUCTOR_LARGE:
-                    try:
-                        from InstructorEmbedding import \
-                            INSTRUCTOR  # noqa: F401
-                    except ImportError:
-                        self._install_instructor_embedding()
-                        self.embeddings = HuggingFaceInstructEmbeddings()
+            if model == EmbeddingsModel.SENTENCETRANSFORMERS_ALL_MPNET_BASE_V2:
+                self.embeddings = HuggingFaceEmbeddings()
+            elif model == EmbeddingsModel.SENTENCETRANSFORMERS_ALL_MINILM_L6_V2:
+                self.embeddings = HuggingFaceEmbeddings(
+                    model_name="sentence-transformers/all-MiniLM-L6-v2",
+                )
+            elif model == EmbeddingsModel.INSTRUCTOR_LARGE:
+                try:
+                    from InstructorEmbedding import INSTRUCTOR  # noqa: F401
+                except ImportError:
+                    self._install_instructor_embedding()
+
+                self.embeddings = HuggingFaceInstructEmbeddings()
 
     def _install_sentence_transformers(self):
         question = [

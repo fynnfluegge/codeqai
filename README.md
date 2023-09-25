@@ -23,5 +23,3 @@ Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](
 - 💻 100% local embeddings and llms
 - 🌐 Also OpenAI and Azure OpenAI support
 
-## How it works
-

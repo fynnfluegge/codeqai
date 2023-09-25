@@ -21,10 +21,10 @@ Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](
 - 🔎 Semantic code search
 - 💬 GPT-like chat with your codebase
 - 💻 100% local embeddings and llms
-- 🌐 Also OpenAI and Azure OpenAI support
+- 🌐 OpenAI and Azure OpenAI support
 
 > [!NOTE]  
-> You will get better results if your code is well documented. You might consider [doc-comments-ai](https://github.com/fynnfluegge/doc-comments.ai) for code documentation generation.
+> There will be better results if the code is well documented. You might consider [doc-comments-ai](https://github.com/fynnfluegge/doc-comments.ai) for code documentation generation.
 
 ## 🚀 Usage
 Start semantic search:
@@ -43,15 +43,15 @@ codeqai chat
 ```
 pipx install codeqai
 ```
-At first usage you can choose to install faiss-cpu or faiss-gpu.
-If you are using local embeddings and llms you will be further asked to install sentence-transformers, instructor or llama.cpp later, based on your configuration.
+At first usage it is asked to install faiss-cpu or faiss-gpu. Faiss-gpu is recommended if the hardware supports CUDA 7.5+.
+If local embeddings and llms are used it will be further asked to install sentence-transformers, instructor or llama.cpp later.
 
 ## ⚙️ Configuration
 At first usage or by running
 ```
 codeqai configure
 ```
-you are prompted to the configuration process, where you can choose the embeddings and llms.
+the configuration process is initiated, where the embeddings and llms can be chosen.
 
 ## 💡 How it works
 The entire git repo is parsed with treesitter to extract all methods with documentations and saved to a local FAISS vector database with either sentence-transformers, instructor or OpenAI's text-embedding-ada-002 embeddings.

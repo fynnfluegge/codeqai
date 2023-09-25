@@ -55,7 +55,7 @@ the configuration process is initiated, where the embeddings and llms can be cho
 
 ## 💡 How it works
 The entire git repo is parsed with treesitter to extract all methods with documentations and saved to a local FAISS vector database with either sentence-transformers, instructor or OpenAI's text-embedding-ada-002 embeddings.
-Afterwards it is possible to do semantic search on your git repo codebase based on the embedding model. To chat with the codebase locally llama.cpp or Ollama can be used by specifying the desired model. OpenAI or Azure-OpenAI can be used for remote chat models. It is also possible to set up the FAISS db with local embeddings to do sematic search locally and use OpenAI as the chat model.
+Afterwards it is possible to do semantic search on your git repo codebase based on the embedding model. To chat with the codebase locally llama.cpp or Ollama is used by specifying the desired model. OpenAI or Azure-OpenAI can be used for remote chat models.
 
 ## FAQ
 ### Where do I get models for llama.cpp?

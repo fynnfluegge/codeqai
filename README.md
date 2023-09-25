@@ -53,6 +53,19 @@ codeqai configure
 ```
 the configuration process is initiated, where the embeddings and llms can be chosen.
 
+## OpenAI
+```bash
+export OPENAI_API_KEY = "your OpenAI api key"
+```
+
+## Azure OpenAI
+```bash
+export OPENAI_API_TYPE = "azure"
+export OPENAI_API_BASE = "https://<your-endpoint.openai.azure.com/"
+export OPENAI_API_KEY = "your AzureOpenAI api key"
+export OPENAI_API_VERSION = "2023-05-15"
+```
+
 ## 💡 How it works
 The entire git repo is parsed with treesitter to extract all methods with documentations and saved to a local FAISS vector database with either sentence-transformers, instructor or OpenAI's text-embedding-ada-002 embeddings.
 Afterwards it is possible to do semantic search on your git repo codebase based on the embedding model. To chat with the codebase locally llama.cpp or Ollama is used by specifying the desired model. OpenAI or Azure-OpenAI can be used for remote chat models.

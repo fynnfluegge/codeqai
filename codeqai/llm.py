@@ -6,17 +6,24 @@ import inquirer
 from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain.chat_models import ChatOpenAI
-from langchain.llms import LlamaCpp, Ollama
+from langchain.llms import AzureOpenAI, LlamaCpp, Ollama
 
 from codeqai import utils
 from codeqai.constants import LllmHost
 
 
 class LLM:
-    def __init__(self, llm_host: LllmHost, chat_model: str):
+    def __init__(self, llm_host: LllmHost, chat_model: str, deployment=None):
         if llm_host == LllmHost.OPENAI:
             self.chat_model = ChatOpenAI(
                 temperature=0.9, max_tokens=2048, model=chat_model
+            )
+        elif llm_host == LllmHost.AZURE_OPENAI and deployment:
+            self.chat_model = AzureOpenAI(
+                temperature=0.9,
+                max_tokens=2048,
+                deployment_name=deployment,
+                model=chat_model,
             )
         elif llm_host == LllmHost.LLAMACPP:
             self.install_llama_cpp()

@@ -9,12 +9,19 @@ from codeqai.constants import EmbeddingsModel
 
 class Embeddings:
     def __init__(
-        self, local=False, model=EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002
+        self,
+        local=False,
+        model=EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002,
+        deployment=None,
     ):
         if not local:
             if model == EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002:
                 self.embeddings = OpenAIEmbeddings(
                     client=None, model="text_embedding_ada_002"
+                )
+            elif model == EmbeddingsModel.AZURE_OPENAI and deployment:
+                self.embeddings = OpenAIEmbeddings(
+                    client=None, model="text_embedding_ada_002", deployment=deployment
                 )
         else:
             try:

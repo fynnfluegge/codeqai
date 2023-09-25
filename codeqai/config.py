@@ -114,9 +114,21 @@ def create_config():
             "embeddings": answers["embeddings"],
             "llm-host": answers["llm-host"],
         }
-        if answers["embeddings"] == "Azure-OpenAI":
-            # TODO add azure config
-            exit("Azure-OpenAI not implemented yet.")
+
+        if (
+            answers["embeddings"] == "Azure-OpenAI"
+            or answers["llm-host"] == "Azure-OpenAI"
+        ):
+            questions = [
+                inquirer.Text(
+                    "deployment",
+                    message="Please enter the Azure OpenAI deployment name.",
+                    default="",
+                ),
+            ]
+            deployment_answer = inquirer.prompt(questions)
+            if deployment_answer and deployment_answer["deployment"]:
+                config["deployment"] = deployment_answer["deployment"]
 
         if answers["llm-host"] == "Llamacpp":
             questions = [
@@ -140,9 +152,6 @@ def create_config():
                     default="gpt-3.5-turbo",
                 ),
             ]
-        elif answers["llm-host"] == "Azure-OpenAI":
-            # TODO add azure config
-            exit("Azure-OpenAI not implemented yet.")
         elif answers["llm-host"] == "OpenAI":
             questions = [
                 inquirer.List(

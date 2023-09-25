@@ -115,20 +115,29 @@ def create_config():
             "llm-host": answers["llm-host"],
         }
 
-        if (
-            answers["embeddings"] == "Azure-OpenAI"
-            or answers["llm-host"] == "Azure-OpenAI"
-        ):
+        if answers["embeddings"] == "Azure-OpenAI":
             questions = [
                 inquirer.Text(
                     "deployment",
-                    message="Please enter the Azure OpenAI deployment name.",
+                    message="Please enter the Azure OpenAI embeddings deployment name.",
                     default="",
                 ),
             ]
             deployment_answer = inquirer.prompt(questions)
             if deployment_answer and deployment_answer["deployment"]:
-                config["deployment"] = deployment_answer["deployment"]
+                config["embeddings-deployment"] = deployment_answer["deployment"]
+
+        if answers["llm-host"] == "Azure-OpenAI":
+            questions = [
+                inquirer.Text(
+                    "deployment",
+                    message="Please enter the Azure OpenAI model deployment name.",
+                    default="",
+                ),
+            ]
+            deployment_answer = inquirer.prompt(questions)
+            if deployment_answer and deployment_answer["deployment"]:
+                config["model-deployment"] = deployment_answer["deployment"]
 
         if answers["llm-host"] == "Llamacpp":
             questions = [

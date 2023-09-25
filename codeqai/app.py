@@ -44,7 +44,9 @@ def run():
     embeddings_model = Embeddings(
         local=True,
         model=EmbeddingsModel[config["embeddings"].upper().replace("-", "_")],
-        deployment=config["deployment"] if "deployment" in config else None,
+        deployment=config["embeddings-deployment"]
+        if "embeddings-deployment" in config
+        else None,
     )
 
     # check if faiss.index exists
@@ -71,7 +73,7 @@ def run():
     llm = LLM(
         llm_host=LllmHost[config["llm-host"].upper().replace("-", "_")],
         chat_model=config["chat-model"],
-        deployment=config["deployment"] if "deployment" in config else None,
+        deployment=config["model-deployment"] if "model-deployment" in config else None,
     )
     memory = ConversationSummaryMemory(
         llm=llm.chat_model, memory_key="chat_history", return_messages=True

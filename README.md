@@ -11,18 +11,10 @@
 
 <div align="center">
 
-Focus on writing your code, let LLMs write the documentation for you.  
-With just a few keystrokes in your terminal by using the OpenAI API or 100% local LLMs without any data leaks.
+Search your codebase semantically or chat with it. 100% local support without any dataleaks.
 
-Built with [langchain](https://github.com/langchain-ai/langchain), [lama.cpp](https://github.com/ggerganov/llama.cpp), [treesitter](https://github.com/tree-sitter/tree-sitter).
+Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](https://github.com/tree-sitter/tree-sitter), [sentence-transformers](https://github.com/UKPLab/sentence-transformers), [instructor-embedding](https://github.com/xlang-ai/instructor-embedding), [faiss](https://github.com/facebookresearch/faiss), [lama.cpp](https://github.com/ggerganov/llama.cpp), [Ollama](https://github.com/jmorganca/ollama).
 
 </div>
 
 ## ✨ Features
-
-
-FAISS
-openai instructor embeddings
-instructor local
-llama.cpp
-litellm

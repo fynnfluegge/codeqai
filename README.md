@@ -21,6 +21,7 @@ Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](
 - 🔎 Semantic code search
 - 💬 GPT-like chat with your codebase
 - 💻 100% local embeddings and llms
+  - sentence-transformers, instructor-embeddings, llama.cpp, Ollama 
 - 🌐 OpenAI and Azure OpenAI support
 
 > [!NOTE]  
@@ -67,8 +68,26 @@ export OPENAI_API_VERSION = "2023-05-15"
 ```
 
 ## 💡 How it works
-The entire git repo is parsed with treesitter to extract all methods with documentations and saved to a local FAISS vector database with either sentence-transformers, instructor or OpenAI's text-embedding-ada-002 embeddings.
-Afterwards it is possible to do semantic search on your git repo codebase based on the embedding model. To chat with the codebase locally llama.cpp or Ollama is used by specifying the desired model. OpenAI or Azure-OpenAI can be used for remote chat models.
+The entire git repo is parsed with treesitter to extract all methods with documentations and saved to a local FAISS vector database with either sentence-transformers, instructor-embeddings or OpenAI's text-embedding-ada-002.
+The vector database is saved to a file on your system and will be loaded later again after further usage.  
+Afterwards it is possible to do semantic search on the codebase based on the embeddings model.  
+To chat with the codebase locally llama.cpp or Ollama is used by specifying the desired model.
+Using llama.cpp the specified model needs to be available on the system in advance. 
+Using Ollama the Ollama container with the desired model needs to be running locally in advance on port 11434.
+Also OpenAI or Azure-OpenAI can be used for remote chat models.  
+
+## 📚 Supported Languages
+- [x] Python
+- [x] Typescript
+- [x] Javascript
+- [x] Java
+- [x] Rust
+- [x] Kotlin
+- [x] Go
+- [ ] C++
+- [ ] C
+- [ ] Lua
+- [ ] Scala
 
 ## FAQ
 ### Where do I get models for llama.cpp?

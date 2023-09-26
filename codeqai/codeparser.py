@@ -1,5 +1,4 @@
 import os
-import re
 
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
@@ -19,9 +18,7 @@ def parse_code_files(code_files: list[str]) -> list[Document]:
             file_extension = utils.get_file_extension(code_file)
             programming_language = utils.get_programming_language(file_extension)
             if programming_language == Language.UNKNOWN:
-                print(
-                    f"Skipping file {code_file} with unsupported programming language"
-                )
+                continue
 
             langchain_language = utils.get_langchain_language(programming_language)
 

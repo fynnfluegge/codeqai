@@ -100,7 +100,8 @@ def create_config():
                 "llm-host",
                 message="Which remote LLM do you want to use?",
                 choices=[
-                    "OpenAI" "Azure-OpenAI",
+                    "OpenAI",
+                    "Azure-OpenAI",
                 ],
                 default="OpenAI",
             ),

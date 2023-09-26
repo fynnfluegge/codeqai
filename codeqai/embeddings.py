@@ -17,12 +17,10 @@ class Embeddings:
         if not local:
             if model == EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002:
                 self.embeddings = OpenAIEmbeddings(
-                    client=None, model="text_embedding_ada_002"
+                    client=None, model="text-embedding-ada-002"
                 )
             elif model == EmbeddingsModel.AZURE_OPENAI and deployment:
-                self.embeddings = OpenAIEmbeddings(
-                    client=None, model="text_embedding_ada_002", deployment=deployment
-                )
+                self.embeddings = OpenAIEmbeddings(client=None, deployment=deployment)
         else:
             try:
                 import sentence_transformers  # noqa: F401

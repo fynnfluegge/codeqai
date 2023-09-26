@@ -8,8 +8,7 @@ from rich.syntax import Syntax
 from yaspin import yaspin
 
 from codeqai import codeparser, repo, utils
-from codeqai.config import (create_cache_dir, create_config, get_cache_path,
-                            load_config)
+from codeqai.config import create_cache_dir, create_config, get_cache_path, load_config
 from codeqai.constants import EmbeddingsModel, LllmHost
 from codeqai.embeddings import Embeddings
 from codeqai.llm import LLM
@@ -42,7 +41,7 @@ def run():
     create_cache_dir()
 
     embeddings_model = Embeddings(
-        local=True,
+        local=config["local"],
         model=EmbeddingsModel[config["embeddings"].upper().replace("-", "_")],
         deployment=config["embeddings-deployment"]
         if "embeddings-deployment" in config
@@ -94,11 +93,17 @@ def run():
                 language = utils.get_programming_language(
                     utils.get_file_extension(doc.metadata["filename"])
                 )
+
                 syntax = Syntax(
-                    doc.page_content, language.value, theme="monokai", line_numbers=True
+                    doc.page_content,
+                    language.value,
+                    theme="monokai",
+                    line_numbers=True,
                 )
                 console = Console()
+                print(doc.metadata["filename"] + " -> " + doc.metadata["method_name"])
                 console.print(syntax)
+                print()
 
             choice = input("[?] (C)ontinue search or (E)xit [C]:").strip().lower()
 

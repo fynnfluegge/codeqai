@@ -8,12 +8,15 @@
 
 </div>
 
-
 <div align="center">
 
 Search your codebase semantically or chat with it from cli. 100% local support without any dataleaks.
 
 Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](https://github.com/tree-sitter/tree-sitter), [sentence-transformers](https://github.com/UKPLab/sentence-transformers), [instructor-embedding](https://github.com/xlang-ai/instructor-embedding), [faiss](https://github.com/facebookresearch/faiss), [lama.cpp](https://github.com/ggerganov/llama.cpp), [Ollama](https://github.com/jmorganca/ollama).
+
+
+https://github.com/fynnfluegge/codeqai/assets/16321871/fec083f0-9fec-4896-8c58-c3b2726485c2
+
 
 </div>
 

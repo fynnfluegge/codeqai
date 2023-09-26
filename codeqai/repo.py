@@ -37,6 +37,9 @@ BLACKLIST_DIR = [
     ".vscode",
     ".github",
     ".gitlab",
+    ".angular",
+    "cdk.out",
+    ".aws-sam",
 ]
 WHITELIST_FILES = [
     ".js",

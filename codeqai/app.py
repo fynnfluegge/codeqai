@@ -8,7 +8,8 @@ from rich.syntax import Syntax
 from yaspin import yaspin
 
 from codeqai import codeparser, repo, utils
-from codeqai.config import create_cache_dir, create_config, get_cache_path, load_config
+from codeqai.config import (create_cache_dir, create_config, get_cache_path,
+                            load_config)
 from codeqai.constants import EmbeddingsModel, LllmHost
 from codeqai.embeddings import Embeddings
 from codeqai.llm import LLM
@@ -55,19 +56,13 @@ def run():
         files = repo.load_files()
         documents = codeparser.parse_code_files(files)
         spinner.stop()
-        spinner = yaspin(text="💾 Indexing vector store...", color="green")
-        spinner.start()
         vector_store = VectorStore(
             repo_name,
             embeddings=embeddings_model.embeddings,
             documents=documents,
         )
-        spinner.stop()
     else:
-        spinner = yaspin(text="💾 Loading vector store...", color="green")
-        spinner.start()
         vector_store = VectorStore(repo_name, embeddings=embeddings_model.embeddings)
-        spinner.stop()
 
     llm = LLM(
         llm_host=LllmHost[config["llm-host"].upper().replace("-", "_")],

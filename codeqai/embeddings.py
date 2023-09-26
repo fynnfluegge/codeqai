@@ -68,6 +68,8 @@ class Embeddings:
                 )
             except subprocess.CalledProcessError as e:
                 print(f"Error during sentence_transformers installation: {e}")
+        else:
+            exit("sentence_transformers is required for local embeddings.")
 
     def _install_instructor_embedding(self):
         question = [
@@ -96,3 +98,5 @@ class Embeddings:
                 )
             except subprocess.CalledProcessError as e:
                 print(f"Error during sentence_transformers installation: {e}")
+        else:
+            exit("InstructorEmbedding is required for local embeddings.")

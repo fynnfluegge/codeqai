@@ -136,5 +136,4 @@ class LLM:
                         )
 
             else:
-                print("", "Installation cancelled. Exiting.", "")
-                return None
+                exit("llama-cpp-python is required for local LLM.")

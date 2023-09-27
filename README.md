@@ -10,26 +10,24 @@
 
 <div align="center">
 
-Search your codebase semantically or chat with it from cli. 100% local support without any dataleaks.
-
+Search your codebase semantically or chat with it from cli. 100% local support without any dataleaks.  
 Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](https://github.com/tree-sitter/tree-sitter), [sentence-transformers](https://github.com/UKPLab/sentence-transformers), [instructor-embedding](https://github.com/xlang-ai/instructor-embedding), [faiss](https://github.com/facebookresearch/faiss), [lama.cpp](https://github.com/ggerganov/llama.cpp), [Ollama](https://github.com/jmorganca/ollama).
 
+<kbd>
+  
+![codeqai-demo](https://github.com/fynnfluegge/codeqai/assets/16321871/666ddc4b-1dad-4e1b-a525-01ef4e599539)
 
-
-
-https://github.com/fynnfluegge/codeqai/assets/16321871/366c3b40-f40e-41a0-a460-6c4ad0036dd8
-
-
+</kbd>
 
 
 </div>
 
 ## ✨ Features
-- 🔎 Semantic code search
-- 💬 GPT-like chat with your codebase
-- 💻 100% local embeddings and llms
+- 🔎 &nbsp;Semantic code search
+- 💬 &nbsp;GPT-like chat with your codebase
+- 💻 &nbsp;100% local embeddings and llms
   - sentence-transformers, instructor-embeddings, llama.cpp, Ollama 
-- 🌐 OpenAI and Azure OpenAI support
+- 🌐 &nbsp;OpenAI and Azure OpenAI support
 
 > [!NOTE]  
 > There will be better results if the code is well documented. You might consider [doc-comments-ai](https://github.com/fynnfluegge/doc-comments.ai) for code documentation generation.
@@ -61,12 +59,14 @@ codeqai configure
 ```
 the configuration process is initiated, where the embeddings and llms can be chosen.
 
-## OpenAI
+## 🌐 Remote models
+If remote models are preferred instead of local, some environment variables needs to be specified in advance.
+### OpenAI
 ```bash
 export OPENAI_API_KEY = "your OpenAI api key"
 ```
 
-## Azure OpenAI
+### Azure OpenAI
 ```bash
 export OPENAI_API_TYPE = "azure"
 export OPENAI_API_BASE = "https://<your-endpoint.openai.azure.com/"

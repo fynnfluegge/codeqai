@@ -10,29 +10,26 @@
 
 <div align="center">
 
-Search your codebase semantically or chat with it from cli. 100% local support without any dataleaks.
-
+Search your codebase semantically or chat with it from cli. 100% local support without any dataleaks.  
 Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](https://github.com/tree-sitter/tree-sitter), [sentence-transformers](https://github.com/UKPLab/sentence-transformers), [instructor-embedding](https://github.com/xlang-ai/instructor-embedding), [faiss](https://github.com/facebookresearch/faiss), [lama.cpp](https://github.com/ggerganov/llama.cpp), [Ollama](https://github.com/jmorganca/ollama).
-
-
-
-
-https://github.com/fynnfluegge/codeqai/assets/16321871/366c3b40-f40e-41a0-a460-6c4ad0036dd8
-
-
-
 
 </div>
 
 ## ✨ Features
-- 🔎 Semantic code search
-- 💬 GPT-like chat with your codebase
-- 💻 100% local embeddings and llms
+- 🔎 &nbsp;Semantic code search
+- 💬 &nbsp;GPT-like chat with your codebase
+- 💻 &nbsp;100% local embeddings and llms
   - sentence-transformers, instructor-embeddings, llama.cpp, Ollama 
-- 🌐 OpenAI and Azure OpenAI support
+- 🌐 &nbsp;OpenAI and Azure OpenAI support
 
 > [!NOTE]  
 > There will be better results if the code is well documented. You might consider [doc-comments-ai](https://github.com/fynnfluegge/doc-comments.ai) for code documentation generation.
+
+### 🔎 &nbsp;Semantic code search demo
+![ezgif-2-5df499d129](https://github.com/fynnfluegge/codeqai/assets/16321871/5a6d566b-2b9c-4ec2-a7c7-51dc5cf4600d)
+
+### 💬 &nbsp;Chat with code demo
+![ezgif-2-1717037083](https://github.com/fynnfluegge/codeqai/assets/16321871/f3eedbea-39c4-4f5a-8375-c44e017387a9)
 
 ## 🚀 Usage
 Start semantic search:
@@ -61,12 +58,14 @@ codeqai configure
 ```
 the configuration process is initiated, where the embeddings and llms can be chosen.
 
-## OpenAI
+## 🌐 Remote models
+If remote models are preferred instead of local, some environment variables needs to be specified in advance.
+### OpenAI
 ```bash
 export OPENAI_API_KEY = "your OpenAI api key"
 ```
 
-## Azure OpenAI
+### Azure OpenAI
 ```bash
 export OPENAI_API_TYPE = "azure"
 export OPENAI_API_BASE = "https://<your-endpoint.openai.azure.com/"

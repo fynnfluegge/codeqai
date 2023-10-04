@@ -15,6 +15,43 @@ from codeqai.embeddings import Embeddings
 from codeqai.llm import LLM
 from codeqai.vector_store import VectorStore
 
+from dotenv import dotenv_values
+
+def env_loader(env_path, required_keys=None):
+    """
+        Args : 
+        env_path = source path of .env file.
+        required_keys = ["OPENAI_KEY"] #change this according to need
+
+        #running/calling the function.
+        configs = env_loader('.env', required_keys)
+    """
+    
+    #create env file if does not exists
+    #parse required keys in the file if it's not None
+    if not os.path.exists(env_path):
+        with open(env_path, 'w') as env_f:
+            if required_keys:
+                for key in required_keys:
+                    env_f.write(f'{key}=""\n')
+            else:
+                pass
+    
+    configs = dotenv_values(env_path)
+    changed = False
+    for key, value in configs.items():
+        if not value:
+            value = input(f'[+] Key {key} is required enter it\'s value :: > ')
+            configs[key] = value
+            changed = True
+
+    #update the .env file if config is changed/taken from user
+    if changed:
+        with open(env_path, 'w') as env_f:
+            for key, value in configs.items():
+                env_f.write(f'{key}="{value}"\n')
+
+    return configs
 
 def run():
     parser = argparse.ArgumentParser()

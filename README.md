@@ -71,21 +71,21 @@ the configuration process is initiated, where the embeddings and llms can be cho
 
 ## 🌐 Remote models
 
-If remote models are preferred instead of local, some environment variables needs to be specified in advance.
+If remote models are used, it is prompted to enter the following required environmnet variables which are then stored in `.config/codeqai/.env`.
 
 ### OpenAI
 
 ```bash
-export OPENAI_API_KEY = "your OpenAI api key"
+$OPENAI_API_KEY = "your OpenAI api key"
 ```
 
 ### Azure OpenAI
 
 ```bash
-export OPENAI_API_TYPE = "azure"
-export OPENAI_API_BASE = "https://<your-endpoint.openai.azure.com/"
-export OPENAI_API_KEY = "your AzureOpenAI api key"
-export OPENAI_API_VERSION = "2023-05-15"
+$OPENAI_API_TYPE = "azure"
+$OPENAI_API_BASE = "https://<your-endpoint.openai.azure.com/"
+$OPENAI_API_KEY = "your AzureOpenAI api key"
+$OPENAI_API_VERSION = "2023-05-15"
 ```
 
 ## 💡 How it works

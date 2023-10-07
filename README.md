@@ -13,11 +13,7 @@
 Search your codebase semantically or chat with it from cli. 100% local support without any dataleaks.  
 Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](https://github.com/tree-sitter/tree-sitter), [sentence-transformers](https://github.com/UKPLab/sentence-transformers), [instructor-embedding](https://github.com/xlang-ai/instructor-embedding), [faiss](https://github.com/facebookresearch/faiss), [lama.cpp](https://github.com/ggerganov/llama.cpp), [Ollama](https://github.com/jmorganca/ollama).
 
-<kbd>
-  
-![codeqai-demo](https://github.com/fynnfluegge/codeqai/assets/16321871/666ddc4b-1dad-4e1b-a525-01ef4e599539)
-
-</kbd>
+![codeqai_demo](https://github.com/fynnfluegge/codeqai/assets/16321871/122565fb-5837-4dbd-bd48-078e5d7fbf90)
 
 </div>
 

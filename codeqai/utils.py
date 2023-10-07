@@ -58,10 +58,16 @@ def get_langchain_language(language: Language) -> text_splitter.Language | None:
         return text_splitter.Language.TS
     elif language == Language.JAVA:
         return text_splitter.Language.JAVA
+    elif language == Language.KOTLIN:
+        return text_splitter.Language.KOTLIN
     elif language == Language.RUST:
         return text_splitter.Language.RUST
     elif language == Language.GO:
         return text_splitter.Language.GO
+    elif language == Language.CPP:
+        return text_splitter.Language.CPP
+    elif language == Language.C_SHARP:
+        return text_splitter.Language.CSHARP
 
     return None
 

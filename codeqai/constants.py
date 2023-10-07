@@ -26,7 +26,7 @@ class EmbeddingsModel(Enum):
     AZURE_OPENAI = "Azure-OpenAI"
 
 
-class LllmHost(Enum):
+class LlmHost(Enum):
     LLAMACPP = "Llamacpp"
     OLLAMA = "Ollama"
     OPENAI = "OpenAI"

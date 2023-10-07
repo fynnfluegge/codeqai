@@ -5,6 +5,8 @@ from pathlib import Path
 import inquirer
 import yaml
 
+from codeqai.constants import EmbeddingsModel, LlmHost
+
 
 def get_cache_path():
     system = platform.system()
@@ -72,20 +74,20 @@ def create_config():
                 "embeddings",
                 message="Which local embeddings model do you want to use?",
                 choices=[
-                    "Instructor-Large",
-                    "SentenceTransformers-all-mpnet-base-v2",
-                    "SentenceTransformers-all-MiniLM-L6-v2",
+                    EmbeddingsModel.INSTRUCTOR_LARGE.value,
+                    EmbeddingsModel.SENTENCETRANSFORMERS_ALL_MPNET_BASE_V2.value,
+                    EmbeddingsModel.SENTENCETRANSFORMERS_ALL_MINILM_L6_V2.value,
                 ],
-                default="Instructor-Large",
+                default=EmbeddingsModel.INSTRUCTOR_LARGE.value,
             ),
             inquirer.List(
                 "llm-host",
                 message="Which local LLM host do you want to use?",
                 choices=[
-                    "Llamacpp",
-                    "Ollama",
+                    LlmHost.LLAMACPP.value,
+                    LlmHost.OLLAMA.value,
                 ],
-                default="Llamacpp",
+                default=LlmHost.LLAMACPP.value,
             ),
         ]
     else:
@@ -93,17 +95,20 @@ def create_config():
             inquirer.List(
                 "embeddings",
                 message="Which remote embeddings do you want to use?",
-                choices=["OpenAI-text-embedding-ada-002", "Azure-OpenAI"],
-                default="OpenAI-text-embedding-ada-002",
+                choices=[
+                    EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002.value,
+                    EmbeddingsModel.AZURE_OPENAI.value,
+                ],
+                default=EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002.value,
             ),
             inquirer.List(
                 "llm-host",
                 message="Which remote LLM do you want to use?",
                 choices=[
-                    "OpenAI",
-                    "Azure-OpenAI",
+                    LlmHost.OPENAI.value,
+                    LlmHost.AZURE_OPENAI.value,
                 ],
-                default="OpenAI",
+                default=LlmHost.OPENAI.value,
             ),
         ]
 
@@ -116,7 +121,7 @@ def create_config():
             "llm-host": answers["llm-host"],
         }
 
-        if answers["embeddings"] == "Azure-OpenAI":
+        if answers["embeddings"] == EmbeddingsModel.AZURE_OPENAI.value:
             questions = [
                 inquirer.Text(
                     "deployment",
@@ -128,11 +133,11 @@ def create_config():
             if deployment_answer and deployment_answer["deployment"]:
                 config["embeddings-deployment"] = deployment_answer["deployment"]
 
-        if answers["llm-host"] == "Azure-OpenAI":
+        if answers["llm-host"] == LlmHost.AZURE_OPENAI.value:
             questions = [
                 inquirer.Text(
                     "deployment",
-                    message="Please enter the Azure OpenAI model deployment name.",
+                    message="Please enter the Azure OpenAI model deployment name",
                     default="",
                 ),
             ]
@@ -140,15 +145,15 @@ def create_config():
             if deployment_answer and deployment_answer["deployment"]:
                 config["model-deployment"] = deployment_answer["deployment"]
 
-        if answers["llm-host"] == "Llamacpp":
+        if answers["llm-host"] == LlmHost.LLAMACPP.value:
             questions = [
                 inquirer.Text(
                     "chat-model",
-                    message="Please enter the path to the LLM model.",
+                    message="Please enter the path to the LLM model",
                     default="",
                 ),
             ]
-        elif answers["llm-host"] == "Ollama":
+        elif answers["llm-host"] == LlmHost.OLLAMA.value:
             questions = [
                 inquirer.List(
                     "chat-model",
@@ -159,7 +164,7 @@ def create_config():
                         "llama2:70b",
                         "codellama",
                     ],
-                    default="gpt-3.5-turbo",
+                    default="llama2:13b",
                 ),
             ]
         elif answers["llm-host"] == "OpenAI":

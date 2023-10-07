@@ -9,23 +9,23 @@ from langchain.chat_models import ChatOpenAI
 from langchain.llms import AzureOpenAI, LlamaCpp, Ollama
 
 from codeqai import utils
-from codeqai.constants import LllmHost
+from codeqai.constants import LlmHost
 
 
 class LLM:
-    def __init__(self, llm_host: LllmHost, chat_model: str, deployment=None):
-        if llm_host == LllmHost.OPENAI:
+    def __init__(self, llm_host: LlmHost, chat_model: str, deployment=None):
+        if llm_host == LlmHost.OPENAI:
             self.chat_model = ChatOpenAI(
                 temperature=0.9, max_tokens=2048, model=chat_model
             )
-        elif llm_host == LllmHost.AZURE_OPENAI and deployment:
+        elif llm_host == LlmHost.AZURE_OPENAI and deployment:
             self.chat_model = AzureOpenAI(
                 temperature=0.9,
                 max_tokens=2048,
                 deployment_name=deployment,
                 model=chat_model,
             )
-        elif llm_host == LllmHost.LLAMACPP:
+        elif llm_host == LlmHost.LLAMACPP:
             self.install_llama_cpp()
             self.chat_model = LlamaCpp(
                 model_path=chat_model,
@@ -33,7 +33,7 @@ class LLM:
                 max_tokens=2048,
                 verbose=False,
             )
-        elif llm_host == LllmHost.OLLAMA:
+        elif llm_host == LlmHost.OLLAMA:
             self.chat_model = Ollama(
                 base_url="http://localhost:11434",
                 model=chat_model,

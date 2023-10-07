@@ -5,17 +5,13 @@ from dotenv import dotenv_values, load_dotenv
 from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationSummaryMemory
 from rich.console import Console
+from rich.markdown import Markdown
 from rich.syntax import Syntax
 from yaspin import yaspin
 
 from codeqai import codeparser, repo, utils
-from codeqai.config import (
-    create_cache_dir,
-    create_config,
-    get_cache_path,
-    get_config_path,
-    load_config,
-)
+from codeqai.config import (create_cache_dir, create_config, get_cache_path,
+                            get_config_path, load_config)
 from codeqai.constants import EmbeddingsModel, LlmHost
 from codeqai.embeddings import Embeddings
 from codeqai.llm import LLM
@@ -34,7 +30,7 @@ def env_loader(env_path, required_keys=None):
 
     # create env file if does not exists
     # parse required keys in the file if it's not None
-    if not os.path.exists(env_path):
+    if not os.path.exists(env_path) or os.path.getsize(env_path) == 0:
         with open(env_path, "w") as env_f:
             if required_keys:
                 for key in required_keys:
@@ -87,7 +83,7 @@ def run():
         config["llm-host"] == LlmHost.OPENAI.value
         or config["embeddings"] == EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002.value
     ):
-        required_keys.append(LlmHost.OPENAI.value)
+        required_keys.append("OPENAI_API_KEY")
 
     if (
         config["llm-host"] == LlmHost.AZURE_OPENAI.value
@@ -144,6 +140,7 @@ def run():
         llm.chat_model, retriever=vector_store.retriever, memory=memory
     )
 
+    console = Console()
     while True:
         choice = None
         if args.action == "search":
@@ -163,7 +160,6 @@ def run():
                     theme="monokai",
                     line_numbers=True,
                 )
-                console = Console()
                 print(doc.metadata["filename"] + " -> " + doc.metadata["method_name"])
                 console.print(syntax)
                 print()
@@ -176,7 +172,8 @@ def run():
             spinner.start()
             result = qa(question)
             spinner.stop()
-            print(result["answer"])
+            markdown = Markdown(result["answer"])
+            console.print(markdown)
 
             choice = (
                 input("[?] (C)ontinue chat, (R)eset chat or (E)xit [C]:")

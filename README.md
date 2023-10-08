@@ -66,6 +66,10 @@ codeqai configure
 
 the configuration process is initiated, where the embeddings and llms can be chosen.
 
+> [!IMPORTANT]  
+> If you want to change the embeddings model in the configuration later, make sure to delete the old files from `~/.cache/codeqai`.
+> Afterwards the vector store files are created again with the recent configured embeddings model. This is neccessary since the similarity search does not work if the models differ.
+
 ## 🌐 Remote models
 
 If remote models are used, the following environment variables are required.

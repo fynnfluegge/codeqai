@@ -52,9 +52,9 @@ codeqai chat
 ```
 pipx install codeqai
 ```
-
-At first usage it is asked to install faiss-cpu or faiss-gpu. Faiss-gpu is recommended if the hardware supports CUDA 7.5+.
-If local embeddings and llms are used it will be further asked to install sentence-transformers, instructor or llama.cpp later.
+> [!NOTE]  
+> Some packages are not installed by default. At first usage it is asked to install faiss-cpu or faiss-gpu. Faiss-gpu is recommended if the hardware supports CUDA 7.5+.
+> If local embeddings and llms are used it will be further asked to install sentence-transformers, instructor or llama.cpp.
 
 ## ⚙️ Configuration
 

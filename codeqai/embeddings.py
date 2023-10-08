@@ -31,7 +31,9 @@ class Embeddings:
                 self.embeddings = HuggingFaceEmbeddings()
             elif model == EmbeddingsModel.SENTENCETRANSFORMERS_ALL_MINILM_L6_V2:
                 self.embeddings = HuggingFaceEmbeddings(
-                    model_name=EmbeddingsModel.SENTENCETRANSFORMERS_ALL_MINILM_L6_V2.value
+                    model_name=EmbeddingsModel.SENTENCETRANSFORMERS_ALL_MINILM_L6_V2.value.replace(
+                        "SentenceTransformers-", ""
+                    )
                 )
             elif model == EmbeddingsModel.INSTRUCTOR_LARGE:
                 try:

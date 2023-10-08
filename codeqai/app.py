@@ -10,8 +10,13 @@ from rich.syntax import Syntax
 from yaspin import yaspin
 
 from codeqai import codeparser, repo, utils
-from codeqai.config import (create_cache_dir, create_config, get_cache_path,
-                            get_config_path, load_config)
+from codeqai.config import (
+    create_cache_dir,
+    create_config,
+    get_cache_path,
+    get_config_path,
+    load_config,
+)
 from codeqai.constants import EmbeddingsModel, LlmHost
 from codeqai.embeddings import Embeddings
 from codeqai.llm import LLM
@@ -41,10 +46,15 @@ def env_loader(env_path, required_keys=None):
     configs = dotenv_values(env_path)
     changed = False
     for key, value in configs.items():
-        if not value:
+        env_key = os.getenv(key)
+        if not value and not env_key:
             value = input(
                 f"[+] Key {utils.get_bold_text(key)} is required. Please enter it's value: "
             )
+            configs[key] = value
+            changed = True
+        elif not value and env_key:
+            value = env_key
             configs[key] = value
             changed = True
 

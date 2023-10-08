@@ -24,6 +24,7 @@ Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](
 - 💻 &nbsp;100% local embeddings and llms
   - sentence-transformers, instructor-embeddings, llama.cpp, Ollama
 - 🌐 &nbsp;OpenAI and Azure OpenAI support
+- 🌳 &nbsp;Treesitter integration
 
 > [!NOTE]  
 > There will be better results if the code is well documented. You might consider [doc-comments-ai](https://github.com/fynnfluegge/doc-comments.ai) for code documentation generation.
@@ -46,14 +47,14 @@ codeqai chat
 
 - Python >= 3.9
 
-## 🔧 Installation
+## 📦 Installation
 
 ```
 pipx install codeqai
 ```
-
-At first usage it is asked to install faiss-cpu or faiss-gpu. Faiss-gpu is recommended if the hardware supports CUDA 7.5+.
-If local embeddings and llms are used it will be further asked to install sentence-transformers, instructor or llama.cpp later.
+> [!NOTE]  
+> Some packages are not installed by default. At first usage it is asked to install faiss-cpu or faiss-gpu. Faiss-gpu is recommended if the hardware supports CUDA 7.5+.
+> If local embeddings and llms are used it will be further asked to install sentence-transformers, instructor or llama.cpp.
 
 ## ⚙️ Configuration
 
@@ -65,24 +66,32 @@ codeqai configure
 
 the configuration process is initiated, where the embeddings and llms can be chosen.
 
+> [!IMPORTANT]  
+> If you want to change the embeddings model in the configuration later, make sure to delete the old files from `~/.cache/codeqai`.
+> Afterwards the vector store files are created again with the recent configured embeddings model. This is neccessary since the similarity search does not work if the models differ.
+
 ## 🌐 Remote models
 
-If remote models are used, it is prompted to enter the following required environmnet variables which are then stored in `.config/codeqai/.env`.
+If remote models are used, the following environment variables are required.
+If the required environment variables are already set, they will be used, otherwise you will be prompted to enter them which are then stored in `~/.config/codeqai/.env`.
 
 ### OpenAI
 
 ```bash
-$OPENAI_API_KEY = "your OpenAI api key"
+export OPENAI_API_KEY = "your OpenAI api key"
 ```
 
 ### Azure OpenAI
 
 ```bash
-$OPENAI_API_TYPE = "azure"
-$OPENAI_API_BASE = "https://<your-endpoint.openai.azure.com/"
-$OPENAI_API_KEY = "your AzureOpenAI api key"
-$OPENAI_API_VERSION = "2023-05-15"
+export OPENAI_API_TYPE = "azure"
+export OPENAI_API_BASE = "https://<your-endpoint>.openai.azure.com/"
+export OPENAI_API_KEY = "your Azure OpenAI api key"
+export OPENAI_API_VERSION = "2023-05-15"
 ```
+
+> [!NOTE]  
+> To change the environment variables later, update the `~/.config/codeqai/.env` manually.
 
 ## 💡 How it works
 

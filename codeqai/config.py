@@ -135,7 +135,6 @@ def create_config():
 
     if confirm and answersEmbedding and answersLlm:
         config = {
-            "local": confirm["confirm"],
             "embeddings": answersEmbedding["embeddings"],
             "llm-host": answersLlm["llm-host"],
         }
@@ -203,7 +202,7 @@ def create_config():
             ]
 
         answersChatmodel = inquirer.prompt(questions)
-        if answersChatmodel and answersEmbedding["chat-model"]:
+        if answersChatmodel and answersChatmodel["chat-model"]:
             config["chat-model"] = answersChatmodel["chat-model"]
 
         save_config(config)

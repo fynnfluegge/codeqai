@@ -43,7 +43,7 @@ Start chat dialog:
 codeqai chat
 ```
 
-On first usage, the repository will be indexed with the configured embeddings model which micht take some minutes.
+At first usage, the repository will be indexed with the configured embeddings model which micht take some minutes.
 
 ## 📋 Requirements
 

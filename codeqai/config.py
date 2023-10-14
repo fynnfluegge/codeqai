@@ -62,7 +62,9 @@ def create_config():
 
     questions = [
         inquirer.Confirm(
-            "confirm", message="Do you want to use local models?", default=False
+            "confirm",
+            message="Do you want to use local embedding models?",
+            default=False,
         ),
     ]
 
@@ -80,6 +82,32 @@ def create_config():
                 ],
                 default=EmbeddingsModel.INSTRUCTOR_LARGE.value,
             ),
+        ]
+    else:
+        questions = [
+            inquirer.List(
+                "embeddings",
+                message="Which remote embeddings do you want to use?",
+                choices=[
+                    EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002.value,
+                    EmbeddingsModel.AZURE_OPENAI.value,
+                ],
+                default=EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002.value,
+            ),
+        ]
+
+    answersEmbedding = inquirer.prompt(questions)
+
+    questions = [
+        inquirer.Confirm(
+            "confirm", message="Do you want to use local chat models?", default=False
+        ),
+    ]
+
+    confirm = inquirer.prompt(questions)
+
+    if confirm and confirm["confirm"]:
+        questions = [
             inquirer.List(
                 "llm-host",
                 message="Which local LLM host do you want to use?",
@@ -93,15 +121,6 @@ def create_config():
     else:
         questions = [
             inquirer.List(
-                "embeddings",
-                message="Which remote embeddings do you want to use?",
-                choices=[
-                    EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002.value,
-                    EmbeddingsModel.AZURE_OPENAI.value,
-                ],
-                default=EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002.value,
-            ),
-            inquirer.List(
                 "llm-host",
                 message="Which remote LLM do you want to use?",
                 choices=[
@@ -112,16 +131,16 @@ def create_config():
             ),
         ]
 
-    answers = inquirer.prompt(questions)
+    answersLlm = inquirer.prompt(questions)
 
-    if confirm and answers:
+    if confirm and answersEmbedding and answersLlm:
         config = {
             "local": confirm["confirm"],
-            "embeddings": answers["embeddings"],
-            "llm-host": answers["llm-host"],
+            "embeddings": answersEmbedding["embeddings"],
+            "llm-host": answersLlm["llm-host"],
         }
 
-        if answers["embeddings"] == EmbeddingsModel.AZURE_OPENAI.value:
+        if config["embeddings"] == EmbeddingsModel.AZURE_OPENAI.value:
             questions = [
                 inquirer.Text(
                     "deployment",
@@ -133,7 +152,7 @@ def create_config():
             if deployment_answer and deployment_answer["deployment"]:
                 config["embeddings-deployment"] = deployment_answer["deployment"]
 
-        if answers["llm-host"] == LlmHost.AZURE_OPENAI.value:
+        if config["llm-host"] == LlmHost.AZURE_OPENAI.value:
             questions = [
                 inquirer.Text(
                     "deployment",
@@ -145,7 +164,7 @@ def create_config():
             if deployment_answer and deployment_answer["deployment"]:
                 config["model-deployment"] = deployment_answer["deployment"]
 
-        if answers["llm-host"] == LlmHost.LLAMACPP.value:
+        elif config["llm-host"] == LlmHost.LLAMACPP.value:
             questions = [
                 inquirer.Text(
                     "chat-model",
@@ -153,7 +172,8 @@ def create_config():
                     default="",
                 ),
             ]
-        elif answers["llm-host"] == LlmHost.OLLAMA.value:
+
+        elif config["llm-host"] == LlmHost.OLLAMA.value:
             questions = [
                 inquirer.List(
                     "chat-model",
@@ -167,7 +187,8 @@ def create_config():
                     default="llama2:13b",
                 ),
             ]
-        elif answers["llm-host"] == "OpenAI":
+
+        elif config["llm-host"] == "OpenAI":
             questions = [
                 inquirer.List(
                     "chat-model",
@@ -181,9 +202,9 @@ def create_config():
                 ),
             ]
 
-        answers = inquirer.prompt(questions)
-        if answers and answers["chat-model"]:
-            config["chat-model"] = answers["chat-model"]
+        answersChatmodel = inquirer.prompt(questions)
+        if answersChatmodel and answersEmbedding["chat-model"]:
+            config["chat-model"] = answersChatmodel["chat-model"]
 
         save_config(config)
 

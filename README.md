@@ -43,6 +43,8 @@ Start chat dialog:
 codeqai chat
 ```
 
+At first usage, the repository will be indexed with the configured embeddings model which micht take some minutes.
+
 ## 📋 Requirements
 
 - Python >= 3.9
@@ -52,6 +54,7 @@ codeqai chat
 ```
 pipx install codeqai
 ```
+
 > [!NOTE]  
 > Some packages are not installed by default. At first usage it is asked to install faiss-cpu or faiss-gpu. Faiss-gpu is recommended if the hardware supports CUDA 7.5+.
 > If local embeddings and llms are used it will be further asked to install sentence-transformers, instructor or llama.cpp.

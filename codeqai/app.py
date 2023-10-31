@@ -10,8 +10,13 @@ from rich.syntax import Syntax
 from yaspin import yaspin
 
 from codeqai import codeparser, repo, utils
-from codeqai.config import (create_cache_dir, create_config, get_cache_path,
-                            get_config_path, load_config)
+from codeqai.config import (
+    create_cache_dir,
+    create_config,
+    get_cache_path,
+    get_config_path,
+    load_config,
+)
 from codeqai.constants import EmbeddingsModel, LlmHost
 from codeqai.embeddings import Embeddings
 from codeqai.llm import LLM

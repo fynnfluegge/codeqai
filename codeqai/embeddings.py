@@ -39,7 +39,10 @@ class Embeddings:
                 except ImportError:
                     self._install_instructor_embedding()
 
-                self.embeddings = HuggingFaceInstructEmbeddings()
+                self.embeddings = HuggingFaceInstructEmbeddings(
+                    embed_instruction="Represent a piece of code: ",
+                    query_instruction="Represent a query for semantic code search: ",
+                )
 
     def _install_sentence_transformers(self):
         question = [

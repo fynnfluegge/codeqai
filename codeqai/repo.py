@@ -37,6 +37,10 @@ BLACKLIST_DIR = [
     ".vscode",
     ".github",
     ".gitlab",
+    ".angular",
+    "cdk.out",
+    ".aws-sam",
+    ".terraform",
 ]
 WHITELIST_FILES = [
     ".js",
@@ -68,4 +72,8 @@ WHITELIST_FILES = [
     ".pm",
     ".lua",
     ".sql",
+    ".yaml",
+    ".yml",
+    ".rst",
+    ".md",
 ]

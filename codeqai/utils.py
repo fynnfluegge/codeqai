@@ -19,11 +19,18 @@ def get_programming_language(file_extension: str) -> Language:
     language_mapping = {
         ".py": Language.PYTHON,
         ".js": Language.JAVASCRIPT,
+        ".jsx": Language.JAVASCRIPT,
+        ".mjs": Language.JAVASCRIPT,
+        ".cjs": Language.JAVASCRIPT,
         ".ts": Language.TYPESCRIPT,
+        ".tsx": Language.TYPESCRIPT,
         ".java": Language.JAVA,
         ".kt": Language.KOTLIN,
         ".rs": Language.RUST,
         ".go": Language.GO,
+        ".cpp": Language.CPP,
+        ".c": Language.C,
+        ".cs": Language.C_SHARP,
     }
     return language_mapping.get(file_extension, Language.UNKNOWN)
 
@@ -48,14 +55,19 @@ def get_langchain_language(language: Language) -> text_splitter.Language | None:
     elif language == Language.JAVASCRIPT:
         return text_splitter.Language.JS
     elif language == Language.TYPESCRIPT:
-        # TODO support typescript
-        return text_splitter.Language.JS
+        return text_splitter.Language.TS
     elif language == Language.JAVA:
         return text_splitter.Language.JAVA
+    elif language == Language.KOTLIN:
+        return text_splitter.Language.KOTLIN
     elif language == Language.RUST:
         return text_splitter.Language.RUST
     elif language == Language.GO:
         return text_splitter.Language.GO
+    elif language == Language.CPP:
+        return text_splitter.Language.CPP
+    elif language == Language.C_SHARP:
+        return text_splitter.Language.CSHARP
 
     return None
 

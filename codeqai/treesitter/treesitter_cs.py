@@ -5,9 +5,23 @@ from codeqai.treesitter.treesitter import Treesitter
 from codeqai.treesitter.treesitter_registry import TreesitterRegistry
 
 
-class TreesitterRust(Treesitter):
+class TreesitterCsharp(Treesitter):
     def __init__(self):
-        super().__init__(Language.RUST, "function_item", "identifier", "line_comment")
+        super().__init__(
+            Language.C_SHARP, "method_declaration", "identifier", "comment"
+        )
+
+    def _query_method_name(self, node: tree_sitter.Node):
+        first_match = None
+        if node.type == self.method_declaration_identifier:
+            for child in node.children:
+                # if the return type is an object type, then the method name
+                # is the second match
+                if child.type == self.method_name_identifier and not first_match:
+                    first_match = child.text.decode()
+                elif child.type == self.method_name_identifier and first_match:
+                    return child.text.decode()
+        return first_match
 
     def _query_all_methods(self, node: tree_sitter.Node):
         methods = []
@@ -45,4 +59,4 @@ class TreesitterRust(Treesitter):
 
 
 # Register the TreesitterJava class in the registry
-TreesitterRegistry.register_treesitter(Language.RUST, TreesitterRust)
+TreesitterRegistry.register_treesitter(Language.C_SHARP, TreesitterCsharp)

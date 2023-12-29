@@ -7,35 +7,46 @@ from codeqai.treesitter.treesitter_registry import TreesitterRegistry
 
 class TreesitterPython(Treesitter):
     def __init__(self):
-        super().__init__(Language.PYTHON)
+        super().__init__(
+            Language.PYTHON, "function_definition", "identifier", "expression_statement"
+        )
 
     def parse(self, file_bytes: bytes) -> list[TreesitterMethodNode]:
-        super().parse(file_bytes)
+        self.tree = self.parser.parse(file_bytes)
         result = []
         methods = self._query_all_methods(self.tree.root_node)
-        methods.reverse()
-        while methods:
-            if methods and methods[-1][1] == "method":
-                doc_comment = self._query_doc_comment(methods[-1][0])
-                if doc_comment:
-                    self.process_method(methods, doc_comment[0], result)
-                else:
-                    self.process_method(methods, None, result)
-
+        for method in methods:
+            method_name = self._query_method_name(method)
+            doc_comment = self._query_doc_comment(method)
+            result.append(TreesitterMethodNode(method_name, doc_comment, method))
         return result
 
+    def _query_method_name(self, node: tree_sitter.Node):
+        if node.type == self.method_declaration_identifier:
+            for child in node.children:
+                if child.type == self.method_name_identifier:
+                    return child.text.decode()
+        return None
+
     def _query_all_methods(self, node: tree_sitter.Node):
-        query_code = """
-        (function_definition
-            name: (identifier) @method_name) @method
-        """
-        query = self.language.query(query_code)
-        return query.captures(node)
+        methods = []
+        for child in node.children:
+            if child.type == self.method_declaration_identifier:
+                methods.append(child)
+        return methods
 
     def _query_doc_comment(self, node: tree_sitter.Node):
-        query_code = "(block . (expression_statement (string)) @doc_str)"
-        query = self.language.query(query_code)
-        return query.captures(node)
+        query_code = """
+            (function_definition
+                body: (block . (expression_statement (string)) @function_doc_str))
+        """
+        doc_str_query = self.language.query(query_code)
+        doc_strs = doc_str_query.captures(node)
+
+        if doc_strs:
+            return doc_strs[0][0].text.decode()
+        else:
+            return None
 
 
 # Register the TreesitterPython class in the registry

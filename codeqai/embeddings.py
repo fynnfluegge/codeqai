@@ -9,13 +9,16 @@ from codeqai.constants import EmbeddingsModel
 
 class Embeddings:
     def __init__(
-        self, local=False, model=EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002
+        self,
+        model=EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002,
+        deployment=None,
     ):
-        if not local:
-            if model == EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002:
-                self.embeddings = OpenAIEmbeddings(
-                    client=None, model="text_embedding_ada_002"
-                )
+        if model == EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002:
+            self.embeddings = OpenAIEmbeddings(
+                client=None, model="text-embedding-ada-002"
+            )
+        elif model == EmbeddingsModel.AZURE_OPENAI and deployment:
+            self.embeddings = OpenAIEmbeddings(client=None, deployment=deployment)
         else:
             try:
                 import sentence_transformers  # noqa: F401
@@ -26,7 +29,9 @@ class Embeddings:
                 self.embeddings = HuggingFaceEmbeddings()
             elif model == EmbeddingsModel.SENTENCETRANSFORMERS_ALL_MINILM_L6_V2:
                 self.embeddings = HuggingFaceEmbeddings(
-                    model_name="sentence-transformers/all-MiniLM-L6-v2",
+                    model_name=EmbeddingsModel.SENTENCETRANSFORMERS_ALL_MINILM_L6_V2.value.replace(
+                        "SentenceTransformers-", ""
+                    )
                 )
             elif model == EmbeddingsModel.INSTRUCTOR_LARGE:
                 try:
@@ -63,6 +68,8 @@ class Embeddings:
                 )
             except subprocess.CalledProcessError as e:
                 print(f"Error during sentence_transformers installation: {e}")
+        else:
+            exit("sentence_transformers is required for local embeddings.")
 
     def _install_instructor_embedding(self):
         question = [
@@ -91,3 +98,5 @@ class Embeddings:
                 )
             except subprocess.CalledProcessError as e:
                 print(f"Error during sentence_transformers installation: {e}")
+        else:
+            exit("InstructorEmbedding is required for local embeddings.")

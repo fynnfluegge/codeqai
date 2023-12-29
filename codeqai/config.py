@@ -5,6 +5,8 @@ from pathlib import Path
 import inquirer
 import yaml
 
+from codeqai.constants import EmbeddingsModel, LlmHost
+
 
 def get_cache_path():
     system = platform.system()
@@ -60,7 +62,9 @@ def create_config():
 
     questions = [
         inquirer.Confirm(
-            "confirm", message="Do you want to use local models?", default=False
+            "confirm",
+            message="Do you want to use local embedding models?",
+            default=False,
         ),
     ]
 
@@ -72,20 +76,11 @@ def create_config():
                 "embeddings",
                 message="Which local embeddings model do you want to use?",
                 choices=[
-                    "Instructor-Large",
-                    "SentenceTransformers-all-mpnet-base-v2",
-                    "SentenceTransformers-all-MiniLM-L6-v2",
+                    EmbeddingsModel.INSTRUCTOR_LARGE.value,
+                    EmbeddingsModel.SENTENCETRANSFORMERS_ALL_MPNET_BASE_V2.value,
+                    EmbeddingsModel.SENTENCETRANSFORMERS_ALL_MINILM_L6_V2.value,
                 ],
-                default="Instructor-Large",
-            ),
-            inquirer.List(
-                "llm-host",
-                message="Which local LLM host do you want to use?",
-                choices=[
-                    "Llamacpp",
-                    "Ollama",
-                ],
-                default="Llamacpp",
+                default=EmbeddingsModel.INSTRUCTOR_LARGE.value,
             ),
         ]
     else:
@@ -93,40 +88,91 @@ def create_config():
             inquirer.List(
                 "embeddings",
                 message="Which remote embeddings do you want to use?",
-                choices=["OpenAI-text-embedding-ada-002", "Azure-OpenAI"],
-                default="OpenAI-text-embedding-ada-002",
+                choices=[
+                    EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002.value,
+                    EmbeddingsModel.AZURE_OPENAI.value,
+                ],
+                default=EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002.value,
             ),
+        ]
+
+    answersEmbedding = inquirer.prompt(questions)
+
+    questions = [
+        inquirer.Confirm(
+            "confirm", message="Do you want to use local chat models?", default=False
+        ),
+    ]
+
+    confirm = inquirer.prompt(questions)
+
+    if confirm and confirm["confirm"]:
+        questions = [
+            inquirer.List(
+                "llm-host",
+                message="Which local LLM host do you want to use?",
+                choices=[
+                    LlmHost.LLAMACPP.value,
+                    LlmHost.OLLAMA.value,
+                ],
+                default=LlmHost.LLAMACPP.value,
+            ),
+        ]
+    else:
+        questions = [
             inquirer.List(
                 "llm-host",
                 message="Which remote LLM do you want to use?",
                 choices=[
-                    "OpenAI" "Azure-OpenAI",
+                    LlmHost.OPENAI.value,
+                    LlmHost.AZURE_OPENAI.value,
                 ],
-                default="OpenAI",
+                default=LlmHost.OPENAI.value,
             ),
         ]
 
-    answers = inquirer.prompt(questions)
+    answersLlm = inquirer.prompt(questions)
 
-    if confirm and answers:
+    if confirm and answersEmbedding and answersLlm:
         config = {
-            "local": confirm["confirm"],
-            "embeddings": answers["embeddings"],
-            "llm-host": answers["llm-host"],
+            "embeddings": answersEmbedding["embeddings"],
+            "llm-host": answersLlm["llm-host"],
         }
-        if answers["embeddings"] == "Azure-OpenAI":
-            # TODO add azure config
-            exit("Azure-OpenAI not implemented yet.")
 
-        if answers["llm-host"] == "Llamacpp":
+        if config["embeddings"] == EmbeddingsModel.AZURE_OPENAI.value:
             questions = [
                 inquirer.Text(
-                    "chat-model",
-                    message="Please enter the path to the LLM model.",
+                    "deployment",
+                    message="Please enter the Azure OpenAI embeddings deployment name.",
                     default="",
                 ),
             ]
-        elif answers["llm-host"] == "Ollama":
+            deployment_answer = inquirer.prompt(questions)
+            if deployment_answer and deployment_answer["deployment"]:
+                config["embeddings-deployment"] = deployment_answer["deployment"]
+
+        if config["llm-host"] == LlmHost.AZURE_OPENAI.value:
+            questions = [
+                inquirer.Text(
+                    "deployment",
+                    message="Please enter the Azure OpenAI model deployment name",
+                    default="",
+                ),
+            ]
+            deployment_answer = inquirer.prompt(questions)
+            if deployment_answer and deployment_answer["deployment"]:
+                config["model-deployment"] = deployment_answer["deployment"]
+
+        elif config["llm-host"] == LlmHost.LLAMACPP.value:
+            questions = [
+                inquirer.Text(
+                    "chat-model",
+                    message="Please enter the path to the LLM model",
+                    default="",
+                ),
+            ]
+
+        elif config["llm-host"] == LlmHost.OLLAMA.value:
             questions = [
                 inquirer.List(
                     "chat-model",
@@ -137,13 +183,11 @@ def create_config():
                         "llama2:70b",
                         "codellama",
                     ],
-                    default="gpt-3.5-turbo",
+                    default="llama2:13b",
                 ),
             ]
-        elif answers["llm-host"] == "Azure-OpenAI":
-            # TODO add azure config
-            exit("Azure-OpenAI not implemented yet.")
-        elif answers["llm-host"] == "OpenAI":
+
+        elif config["llm-host"] == "OpenAI":
             questions = [
                 inquirer.List(
                     "chat-model",
@@ -157,9 +201,9 @@ def create_config():
                 ),
             ]
 
-        answers = inquirer.prompt(questions)
-        if answers and answers["chat-model"]:
-            config["chat-model"] = answers["chat-model"]
+        answersChatmodel = inquirer.prompt(questions)
+        if answersChatmodel and answersChatmodel["chat-model"]:
+            config["chat-model"] = answersChatmodel["chat-model"]
 
         save_config(config)
 

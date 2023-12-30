@@ -1,3 +1,4 @@
+import json
 import os
 import platform
 from pathlib import Path
@@ -6,27 +7,6 @@ import inquirer
 import yaml
 
 from codeqai.constants import EmbeddingsModel, LlmHost
-
-
-def get_cache_path():
-    system = platform.system()
-
-    if system == "Linux" or system == "Darwin":
-        user_home = os.path.expanduser("~")
-        cache_dir = os.path.join(user_home, ".cache", "codeqai")
-    elif system == "Windows":
-        user_home = os.path.expanduser("~")
-        cache_dir = os.path.join(user_home, "AppData", "Local", "codeqai")
-    else:
-        raise NotImplementedError(f"Unsupported platform: {system}")
-
-    return cache_dir
-
-
-def create_cache_dir():
-    if not os.path.exists(get_cache_path()):
-        path = Path(get_cache_path())
-        path.mkdir(parents=True, exist_ok=True)
 
 
 def get_config_path():

@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 from git.repo import Repo
 
@@ -22,6 +23,25 @@ def load_files():
                 file_list.append(os.path.join(root, file))
 
     return file_list
+
+
+def get_commit_hash(file_path):
+    try:
+        # Run the git log command
+        result = subprocess.run(
+            ["git", "log", "-n", "1", "--pretty=format:%H", "--", file_path],
+            stdout=subprocess.PIPE,
+            text=True,
+            check=True,
+        )
+
+        # Extract the commit hash from the command output
+        commit_hash = result.stdout.strip()
+        return commit_hash
+
+    except subprocess.CalledProcessError as e:
+        print(f"Error executing git command: {e}")
+        return None
 
 
 BLACKLIST_DIR = [

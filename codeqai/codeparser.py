@@ -3,7 +3,7 @@ import os
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 
-from codeqai import utils
+from codeqai import repo, utils
 from codeqai.constants import Language
 from codeqai.treesitter.treesitter import Treesitter, TreesitterMethodNode
 
@@ -14,6 +14,7 @@ def parse_code_files(code_files: list[str]) -> list[Document]:
     for code_file in code_files:
         with open(code_file, "r") as file:
             file_bytes = file.read().encode()
+            commit_hash = repo.get_commit_hash(code_file)
 
             file_extension = utils.get_file_extension(code_file)
             programming_language = utils.get_programming_language(file_extension)
@@ -50,6 +51,7 @@ def parse_code_files(code_files: list[str]) -> list[Document]:
                         metadata={
                             "filename": filename,
                             "method_name": node.name,
+                            "commit_hash": commit_hash,
                         },
                     )
                     documents.append(document)

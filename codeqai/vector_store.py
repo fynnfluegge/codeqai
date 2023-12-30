@@ -5,7 +5,7 @@ from langchain.vectorstores import FAISS
 from yaspin import yaspin
 
 from codeqai import utils
-from codeqai.config import get_cache_path
+from codeqai.cache import VectorCache, get_cache_path, load_vector_cache
 
 
 class VectorStore:
@@ -23,14 +23,64 @@ class VectorStore:
                 folder_path=get_cache_path(),
                 embeddings=self.embeddings,
             )
+            self.db.delete([self.db.index_to_docstore_id[0]])
+            self.db.save_local(index_name=self.name, folder_path=get_cache_path())
+            self.vector_cache = load_vector_cache(f"{self.name}.json")
             spinner.stop()
         else:
+            self.vector_cache = {}
             spinner = yaspin(text="💾 Indexing vector store...", color="green")
             spinner.start()
             self.db = FAISS.from_documents(documents, embeddings)
             self.db.save_local(index_name=self.name, folder_path=get_cache_path())
+            index_to_docstore_id = self.db.index_to_docstore_id
+            for i in range(len(documents)):
+                document = self.db.docstore.search(index_to_docstore_id[i])
+                if document:
+                    print(self.vector_cache)
+                    if self.vector_cache.get(document.metadata["filename"]):
+                        self.vector_cache[
+                            document.metadata["filename"]
+                        ].vector_ids.append(index_to_docstore_id[i])
+                    else:
+                        self.vector_cache[document.metadata["filename"]] = VectorCache(
+                            document.metadata["filename"],
+                            [index_to_docstore_id[i]],
+                            document.metadata["commit_hash"],
+                        )
+
             spinner.stop()
         self.retriever = self.db.as_retriever(search_type="mmr", search_kwargs={"k": 8})
+
+    def sync_documents(self, documents: list[Document]):
+        spinner = yaspin(text="💾 Syncing vector store...", color="green")
+        spinner.start()
+        for document in documents:
+            if self.vector_cache.get(document.metadata["filename"]):
+                if (
+                    self.vector_cache[document.metadata["filename"]].commit_hash
+                    != document.metadata["commit_hash"]
+                ):
+                    # This will delete all the vectors associated with the document
+                    # incluing db.index_to_docstore_id, db.docstore and db.index
+                    self.db.delete(
+                        self.vector_cache[document.metadata["filename"]].vector_ids
+                    )
+                    self.db.add_document(document)
+                    self.vector_cache[document.metadata["filename"]] = VectorCache(
+                        document.metadata["filename"],
+                        [self.db.index_to_docstore_id[-1]],
+                        document.metadata["commit_hash"],
+                    )
+            else:
+                self.db.add_document(document)
+                self.vector_cache[document.metadata["filename"]] = VectorCache(
+                    document.metadata["filename"],
+                    [self.db.index_to_docstore_id[-1]],
+                    document.metadata["commit_hash"],
+                )
+
+        spinner.stop()
 
     def similarity_search(self, query: str):
         return self.db.similarity_search(query, k=4)
@@ -55,7 +105,7 @@ class VectorStore:
                 question = [
                     inquirer.List(
                         "faiss-installation",
-                        message=f"Please select the appropriate option to install FAISS.",
+                        message="Please select the appropriate option to install FAISS.",
                         choices=[
                             "faiss-cpu",
                             "faiss-gpu (Only if your system supports CUDA))",

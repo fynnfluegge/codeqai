@@ -9,54 +9,56 @@ from codeqai.cache import VectorCache, get_cache_path, load_vector_cache
 
 
 class VectorStore:
-    def __init__(
-        self, name: str, embeddings: Embeddings, documents: list[Document] = []
-    ):
+    def __init__(self, name: str, embeddings: Embeddings):
         self.name = name
         self.embeddings = embeddings
         self.install_faiss()
-        if not documents:
-            spinner = yaspin(text="💾 Loading vector store...", color="green")
-            spinner.start()
-            self.db = FAISS.load_local(
-                index_name=self.name,
-                folder_path=get_cache_path(),
-                embeddings=self.embeddings,
-            )
-            self.db.delete([self.db.index_to_docstore_id[0]])
-            self.db.save_local(index_name=self.name, folder_path=get_cache_path())
-            self.vector_cache = load_vector_cache(f"{self.name}.json")
-            spinner.stop()
-        else:
-            self.vector_cache = {}
-            spinner = yaspin(text="💾 Indexing vector store...", color="green")
-            spinner.start()
-            self.db = FAISS.from_documents(documents, embeddings)
-            self.db.save_local(index_name=self.name, folder_path=get_cache_path())
-            index_to_docstore_id = self.db.index_to_docstore_id
-            for i in range(len(documents)):
-                document = self.db.docstore.search(index_to_docstore_id[i])
-                if document:
-                    print(self.vector_cache)
-                    if self.vector_cache.get(document.metadata["filename"]):
-                        self.vector_cache[
-                            document.metadata["filename"]
-                        ].vector_ids.append(index_to_docstore_id[i])
-                    else:
-                        self.vector_cache[document.metadata["filename"]] = VectorCache(
-                            document.metadata["filename"],
-                            [index_to_docstore_id[i]],
-                            document.metadata["commit_hash"],
-                        )
 
-            spinner.stop()
+    def load_documents(self):
+        spinner = yaspin(text="💾 Loading vector store...", color="green")
+        spinner.start()
+        self.db = FAISS.load_local(
+            index_name=self.name,
+            folder_path=get_cache_path(),
+            embeddings=self.embeddings,
+        )
+        self.vector_cache = load_vector_cache(f"{self.name}.json")
+        spinner.stop()
+        self.retriever = self.db.as_retriever(search_type="mmr", search_kwargs={"k": 8})
+
+    def index_documents(self, documents: list[Document]):
+        self.vector_cache = {}
+        spinner = yaspin(text="💾 Indexing vector store...", color="green")
+        spinner.start()
+        self.db = FAISS.from_documents(documents, self.embeddings)
+        self.db.save_local(index_name=self.name, folder_path=get_cache_path())
+        index_to_docstore_id = self.db.index_to_docstore_id
+        for i in range(len(documents)):
+            document = self.db.docstore.search(index_to_docstore_id[i])
+            if document:
+                if self.vector_cache.get(document.metadata["filename"]):
+                    self.vector_cache[document.metadata["filename"]].vector_ids.append(
+                        index_to_docstore_id[i]
+                    )
+                else:
+                    self.vector_cache[document.metadata["filename"]] = VectorCache(
+                        document.metadata["filename"],
+                        [index_to_docstore_id[i]],
+                        document.metadata["commit_hash"],
+                    )
+
+        spinner.stop()
         self.retriever = self.db.as_retriever(search_type="mmr", search_kwargs={"k": 8})
 
     def sync_documents(self, documents: list[Document]):
         spinner = yaspin(text="💾 Syncing vector store...", color="green")
         spinner.start()
+        new_filenames = set()
         for document in documents:
-            if self.vector_cache.get(document.metadata["filename"]):
+            print(document.metadata["filename"])
+            new_filenames.add(document.metadata["filename"])
+            if document.metadata["filename"] in self.vector_cache:
+                # check if the file has been modified
                 if (
                     self.vector_cache[document.metadata["filename"]].commit_hash
                     != document.metadata["commit_hash"]
@@ -66,19 +68,38 @@ class VectorStore:
                     self.db.delete(
                         self.vector_cache[document.metadata["filename"]].vector_ids
                     )
-                    self.db.add_document(document)
+                    self.db.add_documents([document])
                     self.vector_cache[document.metadata["filename"]] = VectorCache(
                         document.metadata["filename"],
-                        [self.db.index_to_docstore_id[-1]],
+                        [
+                            self.db.index_to_docstore_id[
+                                len(self.db.index_to_docstore_id) - 1
+                            ]
+                        ],
                         document.metadata["commit_hash"],
                     )
             else:
-                self.db.add_document(document)
+                # add new file to vector store
+                self.db.add_documents([document])
                 self.vector_cache[document.metadata["filename"]] = VectorCache(
                     document.metadata["filename"],
-                    [self.db.index_to_docstore_id[-1]],
+                    [
+                        self.db.index_to_docstore_id[
+                            len(self.db.index_to_docstore_id) - 1
+                        ]
+                    ],
                     document.metadata["commit_hash"],
                 )
+
+        # remove old files from cache and vector store
+        old_filenames = []
+        for cache_item in self.vector_cache.values():
+            if cache_item.filename not in new_filenames:
+                self.db.delete(cache_item.vector_ids)
+                old_filenames.append(cache_item.filename)
+
+        for old_filename in old_filenames:
+            self.vector_cache.pop(old_filename)
 
         spinner.stop()
 

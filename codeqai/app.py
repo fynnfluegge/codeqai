@@ -1,6 +1,5 @@
 import argparse
 import os
-import subprocess
 
 from dotenv import dotenv_values, load_dotenv
 from langchain.chains import ConversationalRetrievalChain
@@ -126,12 +125,13 @@ def run():
         vector_store = VectorStore(
             repo_name,
             embeddings=embeddings_model.embeddings,
-            documents=documents,
         )
+        vector_store.index_documents(documents)
         save_vector_cache(vector_store.vector_cache, f"{repo_name}.json")
         spinner.stop()
     else:
         vector_store = VectorStore(repo_name, embeddings=embeddings_model.embeddings)
+        vector_store.load_documents()
 
     if args.action == "sync":
         spinner = yaspin(text="🔧 Parsing codebase...", color="green")

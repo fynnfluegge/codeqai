@@ -3,6 +3,7 @@ import os
 import langchain.text_splitter as text_splitter
 
 from codeqai.constants import Language
+from codeqai.repo import find_file_in_git_repo
 
 
 def get_programming_language(file_extension: str) -> Language:
@@ -74,3 +75,16 @@ def get_langchain_language(language: Language) -> text_splitter.Language | None:
 
 def get_bold_text(text):
     return f"\033[01m{text}\033[0m"
+
+
+def find_starting_line_and_indent(filename, code_snippet):
+    file_path = find_file_in_git_repo(filename)
+    if file_path is not None:
+        with open(file_path, "r") as file:
+            file_content = file.read()
+            start_pos = file_content.find(code_snippet)
+            return (
+                file_content.count("\n", 0, start_pos) + 1,
+                file_content[:start_pos].split("\n")[-1],
+            )
+    return 1, ""

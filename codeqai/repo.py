@@ -9,6 +9,17 @@ def get_git_root(path):
     return git_root
 
 
+def find_file_in_git_repo(file_name):
+    git_root = get_git_root(os.getcwd())
+
+    for root, dirs, files in os.walk(git_root):
+        if any(blacklist in root for blacklist in BLACKLIST_DIR):
+            continue
+        for file in files:
+            if file == file_name:
+                return os.path.join(root, file)
+
+
 def load_files():
     git_root = get_git_root(os.getcwd())
     file_list = []

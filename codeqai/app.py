@@ -158,11 +158,17 @@ def run():
                     utils.get_file_extension(doc.metadata["filename"])
                 )
 
+                start_line, indentation = utils.find_starting_line_and_indent(
+                    doc.metadata["filename"], doc.page_content
+                )
+
                 syntax = Syntax(
-                    doc.page_content,
+                    indentation + doc.page_content,
                     language.value,
                     theme="monokai",
                     line_numbers=True,
+                    start_line=start_line,
+                    indent_guides=True,
                 )
                 print(doc.metadata["filename"] + " -> " + doc.metadata["method_name"])
                 console.print(syntax)

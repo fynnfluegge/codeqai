@@ -10,8 +10,8 @@ from rich.syntax import Syntax
 from yaspin import yaspin
 
 from codeqai import codeparser, repo, utils
-from codeqai.config import (create_cache_dir, create_config, get_cache_path,
-                            get_config_path, load_config)
+from codeqai.cache import create_cache_dir, get_cache_path, save_vector_cache
+from codeqai.config import create_config, get_config_path, load_config
 from codeqai.constants import EmbeddingsModel, LlmHost
 from codeqai.embeddings import Embeddings
 from codeqai.llm import LLM
@@ -66,7 +66,7 @@ def run():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "action",
-        choices=["search", "chat", "configure"],
+        choices=["search", "chat", "configure", "sync"],
         help="Action to perform. 'search' will semantically search the codebase. 'chat' will chat with the codebase.",
     )
     args = parser.parse_args()
@@ -119,18 +119,27 @@ def run():
 
     # check if faiss.index exists
     if not os.path.exists(os.path.join(get_cache_path(), f"{repo_name}.faiss")):
-        # sync repo
         spinner = yaspin(text="🔧 Parsing codebase...", color="green")
         files = repo.load_files()
         documents = codeparser.parse_code_files(files)
-        spinner.stop()
         vector_store = VectorStore(
             repo_name,
             embeddings=embeddings_model.embeddings,
-            documents=documents,
         )
+        vector_store.index_documents(documents)
+        save_vector_cache(vector_store.vector_cache, f"{repo_name}.json")
+        spinner.stop()
     else:
         vector_store = VectorStore(repo_name, embeddings=embeddings_model.embeddings)
+        vector_store.load_documents()
+
+    if args.action == "sync":
+        spinner = yaspin(text="🔧 Parsing codebase...", color="green")
+        files = repo.load_files()
+        documents = codeparser.parse_code_files(files)
+        vector_store.sync_documents(documents)
+        save_vector_cache(vector_store.vector_cache, f"{repo_name}.json")
+        spinner.stop()
 
     llm = LLM(
         llm_host=LlmHost[config["llm-host"].upper().replace("-", "_")],

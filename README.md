@@ -10,10 +10,14 @@
 
 <div align="center">
 
-Search your codebase semantically or chat with it from cli. 100% local support without any dataleaks.  
-Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](https://github.com/tree-sitter/tree-sitter), [sentence-transformers](https://github.com/UKPLab/sentence-transformers), [instructor-embedding](https://github.com/xlang-ai/instructor-embedding), [faiss](https://github.com/facebookresearch/faiss), [lama.cpp](https://github.com/ggerganov/llama.cpp), [Ollama](https://github.com/jmorganca/ollama).
+Search your codebase semantically or chat with it from cli. Keep the vector database superfast up to date to the latest code changes.
+100% local support without any dataleaks.
+Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](https://github.com/tree-sitter/tree-sitter), [sentence-transformers](https://github.com/UKPLab/sentence-transformers), [instructor-embedding](https://github.com/xlang-ai/instructor-embedding),
+[faiss](https://github.com/facebookresearch/faiss), [lama.cpp](https://github.com/ggerganov/llama.cpp), [Ollama](https://github.com/jmorganca/ollama).
 
-![codeqai_demo](https://github.com/fynnfluegge/codeqai/assets/16321871/3882a30f-7d20-4208-9aea-7da62dbdeef9)
+
+https://github.com/fynnfluegge/codeqai/assets/16321871/2fa92c9b-8010-4487-adb0-c39aa6a5e762
+
 
 </div>
 
@@ -21,6 +25,7 @@ Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](
 
 - 🔎 &nbsp;Semantic code search
 - 💬 &nbsp;GPT-like chat with your codebase
+- ⚙️ &nbsp;Synchronize vector store and latest code changes with ease
 - 💻 &nbsp;100% local embeddings and llms
   - sentence-transformers, instructor-embeddings, llama.cpp, Ollama
 - 🌐 &nbsp;OpenAI and Azure OpenAI support
@@ -42,24 +47,30 @@ Start chat dialog:
 ```
 codeqai chat
 ```
+Synchronize vector store with current git checkout:
 
-At first usage, the repository will be indexed with the configured embeddings model which micht take some minutes.
+```
+codeqai sync
+```
+
+At first usage, the repository will be indexed with the configured embeddings model which might take a moment.
 
 ## 📋 Requirements
 
 - Python >= 3.9
 
 ## 📦 Installation
-
+Install and run in one step:
 ```
-pipx install codeqai
+pipx run --spec codeqai codeqai configure
 ```
+You can also install codeqai through PyPI with `pip install codeqai`. However, it is recommended to use pipx instead to benefit from isolated environments.
 
 > [!NOTE]  
-> Some packages are not installed by default. At first usage it is asked to install faiss-cpu or faiss-gpu. Faiss-gpu is recommended if the hardware supports CUDA 7.5+.
+> Some packages are not installed by default. At first usage it is asked to install `faiss-cpu` or `faiss-gpu`. Faiss-gpu is recommended if the hardware supports CUDA 7.5+.
 > If local embeddings and llms are used it will be further asked to install sentence-transformers, instructor or llama.cpp.
 
-## ⚙️ Configuration
+## 🔧 Configuration
 
 At first usage or by running
 
@@ -119,7 +130,7 @@ Also OpenAI or Azure-OpenAI can be used for remote chat models.
 - [x] C
 - [x] C#
 
-## FAQ
+## ？FAQ
 
 ### Where do I get models for llama.cpp?
 
@@ -134,3 +145,8 @@ will download the `codellama-13b-python.Q5_K_M` model. After the download has fi
 
 > [!IMPORTANT]  
 > `llama.cpp` compatible models must be in the `.gguf` format.
+
+## ✨ Contributing
+
+If you are missing a feature or facing a bug don't hesitate to open an issue or raise a PR.
+Any kind of contribution is highly appreciated!

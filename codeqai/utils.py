@@ -50,7 +50,7 @@ def get_file_extension(file_name: str) -> str:
     return os.path.splitext(file_name)[-1]
 
 
-def get_langchain_language(language: Language) -> text_splitter.Language | None:
+def get_langchain_language(language: Language) -> text_splitter.Language:
     if language == Language.PYTHON:
         return text_splitter.Language.PYTHON
     elif language == Language.JAVASCRIPT:
@@ -69,8 +69,8 @@ def get_langchain_language(language: Language) -> text_splitter.Language | None:
         return text_splitter.Language.CPP
     elif language == Language.C_SHARP:
         return text_splitter.Language.CSHARP
-
-    return None
+    else:
+        return text_splitter.Language.UNKNOWN
 
 
 def get_bold_text(text):

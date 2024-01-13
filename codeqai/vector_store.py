@@ -153,10 +153,10 @@ class VectorStore:
                 question = [
                     inquirer.List(
                         "faiss-installation",
-                        message="Please select the appropriate option to install FAISS.",
+                        message="Please select the appropriate option to install FAISS. Use gpu if your system supports CUDA",
                         choices=[
                             "faiss-cpu",
-                            "faiss-gpu (Only if your system supports CUDA))",
+                            "faiss-gpu",
                         ],
                         default="faiss-cpu",
                     ),

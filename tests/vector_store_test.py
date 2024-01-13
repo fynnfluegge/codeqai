@@ -37,18 +37,11 @@ def test_sync_documents(modified_vector_entries, vector_entries, vector_cache):
     assert len(vector_store.db.index_to_docstore_id) == 4
     vector_store.vector_cache = vector_cache
 
-    for id in vector_store.db.index_to_docstore_id.values():
-        print(vector_store.db.docstore.search(id))
-
     for vector_id in vector_store.db.index_to_docstore_id.values():
         vector_store.vector_cache[
             vector_store.db.docstore.search(vector_id).metadata["filename"]
         ].vector_ids.append(vector_id)
     vector_store.sync_documents(modified_vector_entries)
-
-    print("After sync")
-    for id in vector_store.db.index_to_docstore_id.values():
-        print(vector_store.db.docstore.search(id))
 
     assert len(vector_store.db.index_to_docstore_id) == 5
 

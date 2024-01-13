@@ -2,6 +2,7 @@ import json
 import os
 import platform
 from pathlib import Path
+from typing import Dict
 
 
 class VectorCache:
@@ -11,7 +12,7 @@ class VectorCache:
         self.commit_hash = commit_hash
 
     @classmethod
-    def from_json(cls, json_data):
+    def from_json(cls, json_data) -> "VectorCache":
         filename = json_data.get("filename")
         vector_ids = json_data.get("vector_ids", [])
         commit_hash = json_data.get("commit_hash", "")
@@ -25,9 +26,12 @@ class VectorCache:
         }
 
 
-def load_vector_cache(filename):
+def load_vector_cache(filename) -> Dict[str, VectorCache]:
     with open(get_cache_path() + "/" + filename, "r") as vector_cache_file:
-        vector_cache = json.load(vector_cache_file, object_hook=VectorCache.from_json)
+        vector_cache_json = json.load(vector_cache_file)
+    vector_cache = {}
+    for key, value in vector_cache_json.items():
+        vector_cache[key] = VectorCache.from_json(value)
     return vector_cache
 
 

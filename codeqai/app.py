@@ -140,6 +140,7 @@ def run():
         vector_store.sync_documents(documents)
         save_vector_cache(vector_store.vector_cache, f"{repo_name}.json")
         spinner.stop()
+        print("⚙️  Vector store synced with current git checkout.")
 
     llm = LLM(
         llm_host=LlmHost[config["llm-host"].upper().replace("-", "_")],
@@ -156,6 +157,8 @@ def run():
     console = Console()
     while True:
         choice = None
+        if args.action == "sync":
+            break
         if args.action == "search":
             search_pattern = input("🔎 Enter a search pattern: ")
             spinner = yaspin(text="🤖 Processing...", color="green")

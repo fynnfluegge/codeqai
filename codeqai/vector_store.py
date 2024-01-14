@@ -1,3 +1,5 @@
+import os
+
 import inquirer
 from langchain.embeddings.base import Embeddings
 from langchain.schema import Document
@@ -17,10 +19,11 @@ class VectorStore:
     def load_documents(self):
         spinner = yaspin(text="💾 Loading vector store...", color="green")
         spinner.start()
-        self.db = FAISS.load_local(
-            index_name=self.name,
-            folder_path=get_cache_path(),
-            embeddings=self.embeddings,
+        with open(os.path.join(get_cache_path(), f"{self.name}.faiss"), "rb") as file:
+            index = file.read()
+
+        self.db = FAISS.deserialize_from_bytes(
+            embeddings=self.embeddings, serialized=index
         )
         self.vector_cache = load_vector_cache(f"{self.name}.json")
         spinner.stop()
@@ -31,8 +34,12 @@ class VectorStore:
         spinner = yaspin(text="💾 Indexing vector store...", color="green")
         spinner.start()
         self.db = FAISS.from_documents(documents, self.embeddings)
-        self.db.save_local(index_name=self.name, folder_path=get_cache_path())
-
+        bytes = self.db.serialize_to_bytes()
+        with open(
+            os.path.join(get_cache_path(), f"{self.name}.faiss"), "wb"
+        ) as binary_file:
+            # Write bytes to file
+            binary_file.write(bytes)
         # Create vector cache
         index_to_docstore_id = self.db.index_to_docstore_id
         for i in range(len(documents)):

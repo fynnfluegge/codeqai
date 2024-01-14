@@ -20,7 +20,7 @@ class VectorStore:
         spinner = yaspin(text="💾 Loading vector store...", color="green")
         spinner.start()
         with open(
-            os.path.join(get_cache_path(), f"{self.name}.faiss.bytes"), "rb"
+            os.path.join(get_cache_path(), f"{self.name}_faiss.bytes"), "rb"
         ) as file:
             index = file.read()
 
@@ -38,7 +38,7 @@ class VectorStore:
         self.db = FAISS.from_documents(documents, self.embeddings)
         index = self.db.serialize_to_bytes()
         with open(
-            os.path.join(get_cache_path(), f"{self.name}.faiss.bytes"), "wb"
+            os.path.join(get_cache_path(), f"{self.name}_faiss.bytes"), "wb"
         ) as binary_file:
             binary_file.write(index)
         # Create vector cache
@@ -137,7 +137,7 @@ class VectorStore:
 
         index = self.db.serialize_to_bytes()
         with open(
-            os.path.join(get_cache_path(), f"{self.name}.faiss.bytes"), "wb"
+            os.path.join(get_cache_path(), f"{self.name}_faiss.bytes"), "wb"
         ) as binary_file:
             binary_file.write(index)
         spinner.stop()

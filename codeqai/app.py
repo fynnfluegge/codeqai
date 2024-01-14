@@ -118,7 +118,7 @@ def run():
     )
 
     # check if faiss.index exists
-    if not os.path.exists(os.path.join(get_cache_path(), f"{repo_name}.faiss")):
+    if not os.path.exists(os.path.join(get_cache_path(), f"{repo_name}.faiss.bytes")):
         spinner = yaspin(text="🔧 Parsing codebase...", color="green")
         files = repo.load_files()
         documents = codeparser.parse_code_files(files)
@@ -140,7 +140,7 @@ def run():
         vector_store.sync_documents(documents)
         save_vector_cache(vector_store.vector_cache, f"{repo_name}.json")
         spinner.stop()
-        print("⚙️  Vector store synced with current git checkout.")
+        print("⚙️ Vector store synced with current git checkout.")
 
     llm = LLM(
         llm_host=LlmHost[config["llm-host"].upper().replace("-", "_")],

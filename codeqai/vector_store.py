@@ -19,7 +19,9 @@ class VectorStore:
     def load_documents(self):
         spinner = yaspin(text="💾 Loading vector store...", color="green")
         spinner.start()
-        with open(os.path.join(get_cache_path(), f"{self.name}.faiss"), "rb") as file:
+        with open(
+            os.path.join(get_cache_path(), f"{self.name}.faiss.bytes"), "rb"
+        ) as file:
             index = file.read()
 
         self.db = FAISS.deserialize_from_bytes(
@@ -36,7 +38,7 @@ class VectorStore:
         self.db = FAISS.from_documents(documents, self.embeddings)
         index = self.db.serialize_to_bytes()
         with open(
-            os.path.join(get_cache_path(), f"{self.name}.faiss"), "wb"
+            os.path.join(get_cache_path(), f"{self.name}.faiss.bytes"), "wb"
         ) as binary_file:
             binary_file.write(index)
         # Create vector cache
@@ -133,7 +135,11 @@ class VectorStore:
         for old_filename in old_filenames:
             self.vector_cache.pop(old_filename)
 
-        self.db.save_local(index_name=self.name, folder_path=get_cache_path())
+        index = self.db.serialize_to_bytes()
+        with open(
+            os.path.join(get_cache_path(), f"{self.name}.faiss.bytes"), "wb"
+        ) as binary_file:
+            binary_file.write(index)
         spinner.stop()
 
     def similarity_search(self, query: str):

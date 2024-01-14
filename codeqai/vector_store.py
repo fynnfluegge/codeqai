@@ -34,12 +34,11 @@ class VectorStore:
         spinner = yaspin(text="💾 Indexing vector store...", color="green")
         spinner.start()
         self.db = FAISS.from_documents(documents, self.embeddings)
-        bytes = self.db.serialize_to_bytes()
+        index = self.db.serialize_to_bytes()
         with open(
             os.path.join(get_cache_path(), f"{self.name}.faiss"), "wb"
         ) as binary_file:
-            # Write bytes to file
-            binary_file.write(bytes)
+            binary_file.write(index)
         # Create vector cache
         index_to_docstore_id = self.db.index_to_docstore_id
         for i in range(len(documents)):

@@ -118,7 +118,7 @@ def run():
     )
 
     # check if faiss.index exists
-    if not os.path.exists(os.path.join(get_cache_path(), f"{repo_name}_faiss.bytes")):
+    if not os.path.exists(os.path.join(get_cache_path(), f"{repo_name}.faiss.bytes")):
         spinner = yaspin(text="🔧 Parsing codebase...", color="green")
         files = repo.load_files()
         documents = codeparser.parse_code_files(files)

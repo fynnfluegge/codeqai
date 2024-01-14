@@ -1,11 +1,15 @@
+from pathlib import Path
+
 import pytest
 from langchain.embeddings import FakeEmbeddings
 
+from codeqai.cache import get_cache_path
 from codeqai.vector_store import VectorStore
 
 
 @pytest.mark.usefixtures("vector_entries")
 def test_index_documents(vector_entries):
+    Path(get_cache_path()).mkdir(parents=True, exist_ok=True)
     embeddings = FakeEmbeddings(size=1024)
     vector_store = VectorStore(name="test", embeddings=embeddings)
     vector_store.index_documents(vector_entries)
@@ -31,6 +35,7 @@ def test_index_documents(vector_entries):
 
 @pytest.mark.usefixtures("modified_vector_entries", "vector_entries", "vector_cache")
 def test_sync_documents(modified_vector_entries, vector_entries, vector_cache):
+    Path(get_cache_path()).mkdir(parents=True, exist_ok=True)
     embeddings = FakeEmbeddings(size=1024)
     vector_store = VectorStore(name="test", embeddings=embeddings)
     vector_store.index_documents(vector_entries)

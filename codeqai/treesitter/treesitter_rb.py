@@ -14,5 +14,5 @@ class TreesitterRuby(Treesitter):
     def parse(self, file_bytes: bytes) -> list[TreesitterMethodNode]:
         return super().parse(file_bytes)
 
-# Register the TreesitterJava class in the registry
+# Register the TreesitterRuby class in the registry
 TreesitterRegistry.register_treesitter(Language.RUBY, TreesitterRuby)

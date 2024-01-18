@@ -15,6 +15,7 @@ class Language(Enum):
     OBJECTIVE_C = "objective_c"
     SCALA = "scala"
     LUA = "lua"
+    HASKELL = "haskell"
     UNKNOWN = "unknown"
 
 

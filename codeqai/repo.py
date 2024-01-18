@@ -107,4 +107,5 @@ WHITELIST_FILES = [
     ".yml",
     ".rst",
     ".md",
+    ".hs",
 ]

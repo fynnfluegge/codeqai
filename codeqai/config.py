@@ -142,6 +142,7 @@ def create_config():
             deployment_answer = inquirer.prompt(questions)
             if deployment_answer and deployment_answer["deployment"]:
                 config["model-deployment"] = deployment_answer["deployment"]
+                config["chat-model"] = deployment_answer["deployment"]
 
         elif config["llm-host"] == LlmHost.LLAMACPP.value:
             questions = [
@@ -181,9 +182,11 @@ def create_config():
                 ),
             ]
 
-        answersChatmodel = inquirer.prompt(questions)
-        if answersChatmodel and answersChatmodel["chat-model"]:
-            config["chat-model"] = answersChatmodel["chat-model"]
+        # Check if "chat-model" is already present in the case of Azure_OpenAI
+        if "chat-model" not in config:
+            answersChatmodel = inquirer.prompt(questions)
+            if answersChatmodel and answersChatmodel["chat-model"]:
+                config["chat-model"] = answersChatmodel["chat-model"]
 
         save_config(config)
 

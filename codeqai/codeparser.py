@@ -12,7 +12,7 @@ def parse_code_files(code_files: list[str]) -> list[Document]:
     documents = []
     code_splitter = None
     for code_file in code_files:
-        with open(code_file, "r") as file:
+        with open(code_file, "r", encoding="utf-8") as file:
             file_bytes = file.read().encode()
             commit_hash = repo.get_commit_hash(code_file)
 

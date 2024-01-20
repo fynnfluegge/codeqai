@@ -1,7 +1,5 @@
-import json
 import os
 import platform
-from pathlib import Path
 
 import inquirer
 import yaml

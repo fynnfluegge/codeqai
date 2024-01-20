@@ -27,7 +27,9 @@ class VectorCache:
 
 
 def load_vector_cache(filename) -> Dict[str, VectorCache]:
-    with open(get_cache_path() + "/" + filename, "r") as vector_cache_file:
+    with open(
+        get_cache_path() + "/" + filename, "r", encoding="utf-8"
+    ) as vector_cache_file:
         vector_cache_json = json.load(vector_cache_file)
     vector_cache = {}
     for key, value in vector_cache_json.items():
@@ -36,7 +38,9 @@ def load_vector_cache(filename) -> Dict[str, VectorCache]:
 
 
 def save_vector_cache(vector_cache, filename):
-    with open(get_cache_path() + "/" + filename, "w") as vector_cache_file:
+    with open(
+        get_cache_path() + "/" + filename, "w", encoding="utf-8"
+    ) as vector_cache_file:
         json.dump(vector_cache, default=VectorCache.to_json, fp=vector_cache_file)
 
 

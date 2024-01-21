@@ -49,5 +49,4 @@ class TreesitterPython(Treesitter):
             return None
 
 
-# Register the TreesitterPython class in the registry
 TreesitterRegistry.register_treesitter(Language.PYTHON, TreesitterPython)

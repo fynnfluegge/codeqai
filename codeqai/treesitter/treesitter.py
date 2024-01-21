@@ -63,15 +63,6 @@ class Treesitter(ABC):
                 and node.prev_named_sibling.type == self.doc_comment_identifier
             ):
                 doc_comment_node = node.prev_named_sibling.text.decode()
-            else:
-                # added for haskell purpose.
-                if node.prev_named_sibling and node.prev_named_sibling.type == "signature":
-                    prev_node = node.prev_named_sibling
-                    if (
-                        prev_node.prev_named_sibling
-                        and prev_node.prev_named_sibling.type == self.doc_comment_identifier
-                    ):
-                        doc_comment_node = prev_node.prev_named_sibling.text.decode()
             methods.append({"method": node, "doc_comment": doc_comment_node})
         else:
             for child in node.children:

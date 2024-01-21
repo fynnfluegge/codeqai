@@ -10,5 +10,4 @@ class TreesitterJavascript(Treesitter):
         )
 
 
-# Register the TreesitterJava class in the registry
 TreesitterRegistry.register_treesitter(Language.JAVASCRIPT, TreesitterJavascript)

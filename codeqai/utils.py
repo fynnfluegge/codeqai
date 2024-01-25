@@ -32,6 +32,7 @@ def get_programming_language(file_extension: str) -> Language:
         ".cpp": Language.CPP,
         ".c": Language.C,
         ".cs": Language.C_SHARP,
+        ".hs": Language.HASKELL,
         ".rb": Language.RUBY,
     }
     return language_mapping.get(file_extension, Language.UNKNOWN)
@@ -70,6 +71,8 @@ def get_langchain_language(language: Language) -> text_splitter.Language:
         return text_splitter.Language.CPP
     elif language == Language.C_SHARP:
         return text_splitter.Language.CSHARP
+    elif language == Language.HASKELL:
+        return text_splitter.Language.HASKELL # PR for Haskell support in text_splitter module - https://github.com/langchain-ai/langchain/pull/16191
     elif language == Language.RUBY:
         return text_splitter.Language.RUBY
     else:

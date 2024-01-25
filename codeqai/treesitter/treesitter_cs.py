@@ -58,5 +58,4 @@ class TreesitterCsharp(Treesitter):
         return methods
 
 
-# Register the TreesitterJava class in the registry
 TreesitterRegistry.register_treesitter(Language.C_SHARP, TreesitterCsharp)

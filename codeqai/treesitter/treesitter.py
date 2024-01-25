@@ -12,11 +12,12 @@ class TreesitterMethodNode:
         self,
         name: "str | bytes | None",
         doc_comment: "str | None",
+        method_source_code: "str | None",
         node: tree_sitter.Node,
     ):
         self.name = name
         self.doc_comment = doc_comment
-        self.method_source_code = node.text.decode()
+        self.method_source_code = method_source_code or node.text.decode()
         self.node = node
 
 
@@ -46,7 +47,7 @@ class Treesitter(ABC):
             method_name = self._query_method_name(method["method"])
             doc_comment = method["doc_comment"]
             result.append(
-                TreesitterMethodNode(method_name, doc_comment, method["method"])
+                TreesitterMethodNode(method_name, doc_comment, None, method["method"])
             )
         return result
 

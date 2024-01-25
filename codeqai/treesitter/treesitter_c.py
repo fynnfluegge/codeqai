@@ -22,5 +22,4 @@ class TreesitterC(Treesitter):
         return None
 
 
-# Register the TreesitterJava class in the registry
 TreesitterRegistry.register_treesitter(Language.C, TreesitterC)

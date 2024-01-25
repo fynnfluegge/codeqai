@@ -18,7 +18,7 @@ class TreesitterPython(Treesitter):
         for method in methods:
             method_name = self._query_method_name(method)
             doc_comment = self._query_doc_comment(method)
-            result.append(TreesitterMethodNode(method_name, doc_comment, method))
+            result.append(TreesitterMethodNode(method_name, doc_comment, None, method))
         return result
 
     def _query_method_name(self, node: tree_sitter.Node):
@@ -49,5 +49,4 @@ class TreesitterPython(Treesitter):
             return None
 
 
-# Register the TreesitterPython class in the registry
 TreesitterRegistry.register_treesitter(Language.PYTHON, TreesitterPython)

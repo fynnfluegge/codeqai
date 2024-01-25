@@ -1,7 +1,5 @@
-import json
 import os
 import platform
-from pathlib import Path
 
 import inquirer
 import yaml
@@ -27,13 +25,13 @@ def get_config_path():
 
 
 def load_config():
-    with open(get_config_path(), "r") as config_file:
+    with open(get_config_path(), "r", encoding="utf-8") as config_file:
         config = yaml.safe_load(config_file)
     return config
 
 
 def save_config(config):
-    with open(get_config_path(), "w") as config_file:
+    with open(get_config_path(), "w", encoding="utf-8") as config_file:
         yaml.dump(config, config_file, default_flow_style=False)
 
 
@@ -142,6 +140,7 @@ def create_config():
             deployment_answer = inquirer.prompt(questions)
             if deployment_answer and deployment_answer["deployment"]:
                 config["model-deployment"] = deployment_answer["deployment"]
+                config["chat-model"] = deployment_answer["deployment"]
 
         elif config["llm-host"] == LlmHost.LLAMACPP.value:
             questions = [
@@ -181,9 +180,11 @@ def create_config():
                 ),
             ]
 
-        answersChatmodel = inquirer.prompt(questions)
-        if answersChatmodel and answersChatmodel["chat-model"]:
-            config["chat-model"] = answersChatmodel["chat-model"]
+        # Check if "chat-model" is already present in the case of Azure_OpenAI
+        if "chat-model" not in config:
+            answersChatmodel = inquirer.prompt(questions)
+            if answersChatmodel and answersChatmodel["chat-model"]:
+                config["chat-model"] = answersChatmodel["chat-model"]
 
         save_config(config)
 

@@ -22,5 +22,4 @@ class TreesitterCpp(Treesitter):
         return None
 
 
-# Register the TreesitterJava class in the registry
 TreesitterRegistry.register_treesitter(Language.CPP, TreesitterCpp)

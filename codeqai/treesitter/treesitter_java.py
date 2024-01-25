@@ -10,5 +10,4 @@ class TreesitterJava(Treesitter):
         )
 
 
-# Register the TreesitterJava class in the registry
 TreesitterRegistry.register_treesitter(Language.JAVA, TreesitterJava)

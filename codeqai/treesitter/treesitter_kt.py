@@ -10,5 +10,4 @@ class TreesitterKotlin(Treesitter):
         )
 
 
-# Register the TreesitterJava class in the registry
 TreesitterRegistry.register_treesitter(Language.KOTLIN, TreesitterKotlin)

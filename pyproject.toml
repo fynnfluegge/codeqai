@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "codeqai"
-version = "0.0.9"
+version = "0.0.10"
 description = ""
 authors = ["fynnfluegge <fynnfluegge@gmx.de>"]
 readme = "README.md"
@@ -10,7 +10,6 @@ packages = [{ include = "codeqai" }]
 python = "^3.9"
 tiktoken = "^0.4.0"
 yaspin = "^3.0.0"
-pytest = "^7.4.0"
 inquirer = "^3.1.3"
 gitpython = "^3.1.36"
 langchain = ">=0.0.310,<0.0.330"
@@ -23,6 +22,9 @@ python-dotenv = "^1.0.0"
 
 [tool.poetry.scripts]
 codeqai = "codeqai.__main__:main"
+
+[tool.poetry.group.test.dependencies]
+pytest = "^7.4.4"
 
 [build-system]
 requires = ["poetry-core"]

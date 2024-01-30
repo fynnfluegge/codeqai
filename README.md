@@ -60,11 +60,16 @@ At first usage, the repository will be indexed with the configured embeddings mo
 - Python >= 3.9
 
 ## 📦 Installation
-Install and run in one step:
+Install in an isolated environment with `pipx`:
 ```
-pipx run --spec codeqai codeqai configure
+pipx install codeqai
 ```
-You can also install codeqai through PyPI with `pip install codeqai`. However, it is recommended to use pipx instead to benefit from isolated environments.
+If you are facing issues using pipx uou can also install directly from source through PyPI with
+```
+pip install codeqai
+```
+However, it is recommended to use pipx instead to benefit from isolated environments for the dependencies.  
+For further help visit the [Troubleshooting](https://github.com/fynnfluegge/codeqai?tab=readme-ov-file#troubleshooting) section.
 
 > [!NOTE]  
 > Some packages are not installed by default. At first usage it is asked to install `faiss-cpu` or `faiss-gpu`. Faiss-gpu is recommended if the hardware supports CUDA 7.5+.
@@ -145,6 +150,17 @@ will download the `codellama-13b-python.Q5_K_M` model. After the download has fi
 
 > [!IMPORTANT]  
 > `llama.cpp` compatible models must be in the `.gguf` format.
+
+## 🛟 Troubleshooting
+- #### During installation with `pipx`
+  ```
+  pip failed to build package: tiktoken
+
+  Some possibly relevant errors from pip install:
+    error: subprocess-exited-with-error
+    error: can't find Rust compiler
+  ```
+  Make sure the rust compiler is installed on your system from [here](https://www.rust-lang.org/tools/install).
 
 ## ✨ Contributing
 

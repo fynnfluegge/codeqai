@@ -69,7 +69,7 @@ If you are facing issues using pipx uou can also install directly from source th
 pip install codeqai
 ```
 However, it is recommended to use pipx instead to benefit from isolated environments for the dependencies.  
-For further help visit the [Troubleshooting](https://github.com/fynnfluegge/codeqai?tab=readme-ov-file#troubleshooting) section.
+For further help visit the [Troubleshooting](https://github.com/fynnfluegge/codeqai?tab=readme-ov-file#-troubleshooting) section.
 
 > [!NOTE]  
 > Some packages are not installed by default. At first usage it is asked to install `faiss-cpu` or `faiss-gpu`. Faiss-gpu is recommended if the hardware supports CUDA 7.5+.

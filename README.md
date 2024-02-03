@@ -57,7 +57,7 @@ At first usage, the repository will be indexed with the configured embeddings mo
 
 ## 📋 Requirements
 
-- Python >= 3.9
+- Python >=3.9,<3.12
 
 ## 📦 Installation
 Install in an isolated environment with `pipx`:

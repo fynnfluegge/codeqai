@@ -96,8 +96,7 @@ def run():
     ):
         required_keys.extend(
             [
-                "OPENAI_API_TYPE",
-                "OPENAI_API_BASE_URL",
+                "OPENAI_API_BASE",
                 "OPENAI_API_KEY",
                 "OPENAI_API_VERSION",
             ]

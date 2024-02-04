@@ -5,7 +5,7 @@ import sys
 import inquirer
 from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain.chat_models import ChatOpenAI, AzureChatOpenAI
+from langchain.chat_models import AzureChatOpenAI, ChatOpenAI
 from langchain.llms import LlamaCpp, Ollama
 
 from codeqai import utils
@@ -19,13 +19,19 @@ class LLM:
                 temperature=0.9, max_tokens=2048, model=chat_model
             )
         elif llm_host == LlmHost.AZURE_OPENAI and deployment:
-            self.chat_model = AzureChatOpenAI(
-                openai_api_base=os.getenv("OPENAI_API_BASE"),
-                temperature=0.9,
-                max_tokens=2048,
-                deployment_name=deployment,
-                model=chat_model,
-            )
+            openai_ap_base = os.getenv("OPENAI_API_BASE")
+            if openai_ap_base:
+                self.chat_model = AzureChatOpenAI(
+                    openai_api_base=openai_ap_base,
+                    temperature=0.9,
+                    max_tokens=2048,
+                    deployment_name=deployment,
+                    model=chat_model,
+                )
+            else:
+                raise ValueError(
+                    "Azure OpenAI requires environment variable OPENAI_API_BASE to be set."
+                )
         elif llm_host == LlmHost.LLAMACPP:
             self.install_llama_cpp()
             self.chat_model = LlamaCpp(
@@ -81,9 +87,9 @@ class LLM:
                     elif backend == "Metal":
                         env_vars["CMAKE_ARGS"] = "-DLLAMA_METAL=on"
                     else:  # Default to OpenBLAS
-                        env_vars[
-                            "CMAKE_ARGS"
-                        ] = "-DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS"
+                        env_vars["CMAKE_ARGS"] = (
+                            "-DLLAMA_BLAS=ON -DLLAMA_BLAS_VENDOR=OpenBLAS"
+                        )
 
                     try:
                         subprocess.run(

@@ -51,7 +51,7 @@ def get_file_extension(file_name: str) -> str:
     return os.path.splitext(file_name)[-1]
 
 
-def get_langchain_language(language: Language) -> text_splitter.Language | None:
+def get_langchain_language(language: Language):
     if language == Language.PYTHON:
         return text_splitter.Language.PYTHON
     elif language == Language.JAVASCRIPT:

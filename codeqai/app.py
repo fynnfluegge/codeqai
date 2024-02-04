@@ -62,6 +62,12 @@ def env_loader(env_path, required_keys=None):
 
 
 def run():
+    if not subprocess.run(
+        ["git", "rev-parse", "--is-inside-work-tree"], capture_output=True
+    ).stdout:
+        print("Not a git repository. Exiting.")
+        exit()
+
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "action",

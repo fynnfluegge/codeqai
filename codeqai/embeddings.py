@@ -1,7 +1,7 @@
 import inquirer
-from langchain.embeddings import (HuggingFaceEmbeddings,
-                                  HuggingFaceInstructEmbeddings)
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain_community.embeddings import (HuggingFaceEmbeddings,
+                                            HuggingFaceInstructEmbeddings)
+from langchain_openai import OpenAIEmbeddings
 
 from codeqai import utils
 from codeqai.constants import EmbeddingsModel

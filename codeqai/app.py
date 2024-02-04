@@ -1,6 +1,7 @@
 import argparse
 import os
 import subprocess
+import warnings
 
 from dotenv import dotenv_values, load_dotenv
 from rich.console import Console
@@ -67,6 +68,7 @@ def run():
     ).stdout:
         print("Not a git repository. Exiting.")
         exit()
+    warnings.filterwarnings("ignore", category=DeprecationWarning)
 
     parser = argparse.ArgumentParser()
     parser.add_argument(

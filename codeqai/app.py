@@ -68,7 +68,6 @@ def run():
         choices=["app", "search", "chat", "configure", "sync"],
         help="Action to perform. 'search' will semantically search the codebase. 'chat' will chat with the codebase.",
     )
-    print("🚀 CodeQAI - AI-powered codebase search and chat")
     args = parser.parse_args()
 
     if args.action == "configure":

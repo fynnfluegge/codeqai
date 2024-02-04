@@ -7,7 +7,7 @@ readme = "README.md"
 packages = [{ include = "codeqai" }]
 
 [tool.poetry.dependencies]
-python = "^3.9"
+python = ">=3.9,<3.9.7 || >3.9.7,<3.12"
 tiktoken = "^0.4.0"
 yaspin = "^3.0.0"
 inquirer = "^3.1.3"
@@ -19,6 +19,7 @@ tree-sitter = "^0.20.2"
 tree-sitter-languages = "^1.7.0"
 rich = "^13.5.3"
 python-dotenv = "^1.0.0"
+streamlit = "^1.31.0"
 
 [tool.poetry.scripts]
 codeqai = "codeqai.__main__:main"

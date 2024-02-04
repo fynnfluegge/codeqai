@@ -1,5 +1,6 @@
 import argparse
 import os
+import subprocess
 
 from dotenv import dotenv_values, load_dotenv
 from langchain.chains import ConversationalRetrievalChain
@@ -66,9 +67,10 @@ def run():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "action",
-        choices=["search", "chat", "configure", "sync"],
+        choices=["app", "search", "chat", "configure", "sync"],
         help="Action to perform. 'search' will semantically search the codebase. 'chat' will chat with the codebase.",
     )
+    print("🚀 CodeQAI - AI-powered codebase search and chat")
     args = parser.parse_args()
 
     if args.action == "configure":
@@ -112,9 +114,11 @@ def run():
 
     embeddings_model = Embeddings(
         model=EmbeddingsModel[config["embeddings"].upper().replace("-", "_")],
-        deployment=config["embeddings-deployment"]
-        if "embeddings-deployment" in config
-        else None,
+        deployment=(
+            config["embeddings-deployment"]
+            if "embeddings-deployment" in config
+            else None
+        ),
     )
 
     # check if faiss.index exists
@@ -129,87 +133,96 @@ def run():
         vector_store.index_documents(documents)
         save_vector_cache(vector_store.vector_cache, f"{repo_name}.json")
         spinner.stop()
+
+    if args.action == "app":
+        subprocess.run(["streamlit", "run", "codeqai/streamlit.py"])
     else:
         vector_store = VectorStore(repo_name, embeddings=embeddings_model.embeddings)
         vector_store.load_documents()
 
-    if args.action == "sync":
-        spinner = yaspin(text="🔧 Parsing codebase...", color="green")
-        files = repo.load_files()
-        documents = codeparser.parse_code_files(files)
-        vector_store.sync_documents(documents)
-        save_vector_cache(vector_store.vector_cache, f"{repo_name}.json")
-        spinner.stop()
-        print("⚙️ Vector store synced with current git checkout.")
-
-    llm = LLM(
-        llm_host=LlmHost[config["llm-host"].upper().replace("-", "_")],
-        chat_model=config["chat-model"],
-        deployment=config["model-deployment"] if "model-deployment" in config else None,
-    )
-    memory = ConversationSummaryMemory(
-        llm=llm.chat_model, memory_key="chat_history", return_messages=True
-    )
-    qa = ConversationalRetrievalChain.from_llm(
-        llm.chat_model, retriever=vector_store.retriever, memory=memory
-    )
-
-    console = Console()
-    while True:
-        choice = None
         if args.action == "sync":
-            break
-        if args.action == "search":
-            search_pattern = input("🔎 Enter a search pattern: ")
-            spinner = yaspin(text="🤖 Processing...", color="green")
-            spinner.start()
-            similarity_result = vector_store.similarity_search(search_pattern)
+            spinner = yaspin(text="🔧 Parsing codebase...", color="green")
+            files = repo.load_files()
+            documents = codeparser.parse_code_files(files)
+            vector_store.sync_documents(documents)
+            save_vector_cache(vector_store.vector_cache, f"{repo_name}.json")
             spinner.stop()
-            for doc in similarity_result:
-                language = utils.get_programming_language(
-                    utils.get_file_extension(doc.metadata["filename"])
+            print("✅ Vector store synced with current git checkout.")
+
+        llm = LLM(
+            llm_host=LlmHost[config["llm-host"].upper().replace("-", "_")],
+            chat_model=config["chat-model"],
+            deployment=(
+                config["model-deployment"] if "model-deployment" in config else None
+            ),
+        )
+        memory = ConversationSummaryMemory(
+            llm=llm.chat_model, memory_key="chat_history", return_messages=True
+        )
+        qa = ConversationalRetrievalChain.from_llm(
+            llm.chat_model, retriever=vector_store.retriever, memory=memory
+        )
+        console = Console()
+        while True:
+            choice = None
+            if args.action == "sync":
+                break
+            if args.action == "search":
+                search_pattern = input("🔎 Enter a search pattern: ")
+                spinner = yaspin(text="🤖 Processing...", color="green")
+                spinner.start()
+                similarity_result = vector_store.similarity_search(search_pattern)
+                spinner.stop()
+                for doc in similarity_result:
+                    language = utils.get_programming_language(
+                        utils.get_file_extension(doc.metadata["filename"])
+                    )
+
+                    start_line, indentation = utils.find_starting_line_and_indent(
+                        doc.metadata["filename"], doc.page_content
+                    )
+
+                    syntax = Syntax(
+                        indentation + doc.page_content,
+                        language.value,
+                        theme="monokai",
+                        line_numbers=True,
+                        start_line=start_line,
+                        indent_guides=True,
+                    )
+                    print(
+                        doc.metadata["filename"] + " -> " + doc.metadata["method_name"]
+                    )
+                    console.print(syntax)
+                    print()
+
+                choice = input("[?] (C)ontinue search or (E)xit [C]:").strip().lower()
+
+            elif args.action == "chat":
+                question = input("💬 Ask anything about the codebase: ")
+                spinner = yaspin(text="🤖 Processing...", color="green")
+                spinner.start()
+                result = qa(question)
+                spinner.stop()
+                markdown = Markdown(result["answer"])
+                console.print(markdown)
+
+                choice = (
+                    input("[?] (C)ontinue chat, (R)eset chat or (E)xit [C]:")
+                    .strip()
+                    .lower()
                 )
 
-                start_line, indentation = utils.find_starting_line_and_indent(
-                    doc.metadata["filename"], doc.page_content
-                )
+                if choice == "r":
+                    memory.clear()
+                    print("Chat history cleared.")
+            else:
+                print("Invalid action.")
+                exit()
 
-                syntax = Syntax(
-                    indentation + doc.page_content,
-                    language.value,
-                    theme="monokai",
-                    line_numbers=True,
-                    start_line=start_line,
-                    indent_guides=True,
-                )
-                print(doc.metadata["filename"] + " -> " + doc.metadata["method_name"])
-                console.print(syntax)
-                print()
-
-            choice = input("[?] (C)ontinue search or (E)xit [C]:").strip().lower()
-
-        elif args.action == "chat":
-            question = input("💬 Ask anything about the codebase: ")
-            spinner = yaspin(text="🤖 Processing...", color="green")
-            spinner.start()
-            result = qa(question)
-            spinner.stop()
-            markdown = Markdown(result["answer"])
-            console.print(markdown)
-
-            choice = (
-                input("[?] (C)ontinue chat, (R)eset chat or (E)xit [C]:")
-                .strip()
-                .lower()
-            )
-
-            if choice == "r":
-                memory.clear()
-                print("Chat history cleared.")
-
-        if choice == "" or choice == "c":
-            continue
-        elif choice == "e":
-            break
-        else:
-            print("Invalid choice. Please enter 'C', 'E', or 'R'.")
+            if choice == "" or choice == "c":
+                continue
+            elif choice == "e":
+                break
+            else:
+                print("Invalid choice. Please enter 'C', 'E', or 'R'.")

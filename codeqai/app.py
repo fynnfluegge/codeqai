@@ -128,12 +128,16 @@ def run():
     # check if faiss.index exists
     if not os.path.exists(os.path.join(get_cache_path(), f"{repo_name}.faiss.bytes")):
         spinner = yaspin(text="🔧 Parsing codebase...", color="green")
+        spinner.start()
         files = repo.load_files()
         documents = codeparser.parse_code_files(files)
+        spinner.stop()
+        spinner = yaspin(text="💾 Indexing vector store...", color="green")
         vector_store = VectorStore(
             repo_name,
             embeddings=embeddings_model.embeddings,
         )
+        spinner.start()
         vector_store.index_documents(documents)
         save_vector_cache(vector_store.vector_cache, f"{repo_name}.json")
         spinner.stop()
@@ -141,7 +145,23 @@ def run():
     if args.action == "app":
         subprocess.run(["streamlit", "run", "codeqai/streamlit.py"])
     else:
+        spinner = yaspin(text="💾 Loading vector store...", color="green")
+        spinner.start()
         vector_store, memory, qa = bootstrap(config, repo_name, embeddings_model)
+        spinner.stop()
+
+        if args.action == "sync":
+            spinner = yaspin(text="🔧 Parsing codebase...", color="green")
+            files = repo.load_files()
+            documents = codeparser.parse_code_files(files)
+            spinner.stop()
+            spinner = yaspin(text="💾 Syncing vector store...", color="green")
+            spinner.start()
+            vector_store.sync_documents(documents)
+            save_vector_cache(vector_store.vector_cache, f"{repo_name}.json")
+            spinner.stop()
+            print("✅ Vector store synced with current git checkout.")
+
         console = Console()
         while True:
             choice = None

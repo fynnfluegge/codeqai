@@ -4,7 +4,6 @@ import inquirer
 from langchain.embeddings.base import Embeddings
 from langchain.schema import Document
 from langchain_community.vectorstores import FAISS
-from yaspin import yaspin
 
 from codeqai import utils
 from codeqai.cache import VectorCache, get_cache_path, load_vector_cache
@@ -17,8 +16,6 @@ class VectorStore:
         self.install_faiss()
 
     def load_documents(self):
-        spinner = yaspin(text="💾 Loading vector store...", color="green")
-        spinner.start()
         with open(
             os.path.join(get_cache_path(), f"{self.name}.faiss.bytes"), "rb"
         ) as file:
@@ -28,13 +25,10 @@ class VectorStore:
             embeddings=self.embeddings, serialized=index
         )
         self.vector_cache = load_vector_cache(f"{self.name}.json")
-        spinner.stop()
         self.retriever = self.db.as_retriever(search_type="mmr", search_kwargs={"k": 8})
 
     def index_documents(self, documents: list[Document]):
         self.vector_cache = {}
-        spinner = yaspin(text="💾 Indexing vector store...", color="green")
-        spinner.start()
         self.db = FAISS.from_documents(documents, self.embeddings)
         index = self.db.serialize_to_bytes()
         with open(
@@ -60,13 +54,9 @@ class VectorStore:
                         document.metadata["commit_hash"],
                     )
 
-        spinner.stop()
         self.retriever = self.db.as_retriever(search_type="mmr", search_kwargs={"k": 8})
 
     def sync_documents(self, documents: list[Document]):
-        spinner = yaspin(text="💾 Syncing vector store...", color="green")
-        spinner.start()
-
         new_filenames = set()
         modified_filenames = set()
 
@@ -140,7 +130,6 @@ class VectorStore:
             os.path.join(get_cache_path(), f"{self.name}.faiss.bytes"), "wb"
         ) as binary_file:
             binary_file.write(index)
-        spinner.stop()
 
     def similarity_search(self, query: str):
         return self.db.similarity_search(query, k=4)

@@ -1,20 +1,19 @@
 import argparse
 import os
+import subprocess
 
 from dotenv import dotenv_values, load_dotenv
-from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationSummaryMemory
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.syntax import Syntax
 from yaspin import yaspin
 
 from codeqai import codeparser, repo, utils
+from codeqai.bootstrap import bootstrap
 from codeqai.cache import create_cache_dir, get_cache_path, save_vector_cache
 from codeqai.config import create_config, get_config_path, load_config
 from codeqai.constants import EmbeddingsModel, LlmHost
 from codeqai.embeddings import Embeddings
-from codeqai.llm import LLM
 from codeqai.vector_store import VectorStore
 
 
@@ -66,7 +65,7 @@ def run():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "action",
-        choices=["search", "chat", "configure", "sync"],
+        choices=["app", "search", "chat", "configure", "sync"],
         help="Action to perform. 'search' will semantically search the codebase. 'chat' will chat with the codebase.",
     )
     args = parser.parse_args()
@@ -96,8 +95,7 @@ def run():
     ):
         required_keys.extend(
             [
-                "OPENAI_API_TYPE",
-                "OPENAI_API_BASE_URL",
+                "OPENAI_API_BASE",
                 "OPENAI_API_KEY",
                 "OPENAI_API_VERSION",
             ]
@@ -105,16 +103,18 @@ def run():
     env_path = get_config_path().replace("config.yaml", ".env")
     env_loader(env_path, required_keys)
 
-    repo_name = repo.get_git_root(os.getcwd()).split("/")[-1]
+    repo_name = repo.repo_name()
 
     # init cache
     create_cache_dir()
 
     embeddings_model = Embeddings(
         model=EmbeddingsModel[config["embeddings"].upper().replace("-", "_")],
-        deployment=config["embeddings-deployment"]
-        if "embeddings-deployment" in config
-        else None,
+        deployment=(
+            config["embeddings-deployment"]
+            if "embeddings-deployment" in config
+            else None
+        ),
     )
 
     # check if faiss.index exists
@@ -129,87 +129,72 @@ def run():
         vector_store.index_documents(documents)
         save_vector_cache(vector_store.vector_cache, f"{repo_name}.json")
         spinner.stop()
+
+    if args.action == "app":
+        subprocess.run(["streamlit", "run", "codeqai/streamlit.py"])
     else:
-        vector_store = VectorStore(repo_name, embeddings=embeddings_model.embeddings)
-        vector_store.load_documents()
+        vector_store, memory, qa = bootstrap(config, repo_name, embeddings_model)
+        console = Console()
+        while True:
+            choice = None
+            if args.action == "sync":
+                break
+            if args.action == "search":
+                search_pattern = input("🔎 Enter a search pattern: ")
+                spinner = yaspin(text="🤖 Processing...", color="green")
+                spinner.start()
+                similarity_result = vector_store.similarity_search(search_pattern)
+                spinner.stop()
+                for doc in similarity_result:
+                    language = utils.get_programming_language(
+                        utils.get_file_extension(doc.metadata["filename"])
+                    )
 
-    if args.action == "sync":
-        spinner = yaspin(text="🔧 Parsing codebase...", color="green")
-        files = repo.load_files()
-        documents = codeparser.parse_code_files(files)
-        vector_store.sync_documents(documents)
-        save_vector_cache(vector_store.vector_cache, f"{repo_name}.json")
-        spinner.stop()
-        print("⚙️ Vector store synced with current git checkout.")
+                    start_line, indentation = utils.find_starting_line_and_indent(
+                        doc.metadata["filename"], doc.page_content
+                    )
 
-    llm = LLM(
-        llm_host=LlmHost[config["llm-host"].upper().replace("-", "_")],
-        chat_model=config["chat-model"],
-        deployment=config["model-deployment"] if "model-deployment" in config else None,
-    )
-    memory = ConversationSummaryMemory(
-        llm=llm.chat_model, memory_key="chat_history", return_messages=True
-    )
-    qa = ConversationalRetrievalChain.from_llm(
-        llm.chat_model, retriever=vector_store.retriever, memory=memory
-    )
+                    syntax = Syntax(
+                        indentation + doc.page_content,
+                        language.value,
+                        theme="monokai",
+                        line_numbers=True,
+                        start_line=start_line,
+                        indent_guides=True,
+                    )
+                    print(
+                        doc.metadata["filename"] + " -> " + doc.metadata["method_name"]
+                    )
+                    console.print(syntax)
+                    print()
 
-    console = Console()
-    while True:
-        choice = None
-        if args.action == "sync":
-            break
-        if args.action == "search":
-            search_pattern = input("🔎 Enter a search pattern: ")
-            spinner = yaspin(text="🤖 Processing...", color="green")
-            spinner.start()
-            similarity_result = vector_store.similarity_search(search_pattern)
-            spinner.stop()
-            for doc in similarity_result:
-                language = utils.get_programming_language(
-                    utils.get_file_extension(doc.metadata["filename"])
+                choice = input("[?] (C)ontinue search or (E)xit [C]:").strip().lower()
+
+            elif args.action == "chat":
+                question = input("💬 Ask anything about the codebase: ")
+                spinner = yaspin(text="🤖 Processing...", color="green")
+                spinner.start()
+                result = qa(question)
+                spinner.stop()
+                markdown = Markdown(result["answer"])
+                console.print(markdown)
+
+                choice = (
+                    input("[?] (C)ontinue chat, (R)eset chat or (E)xit [C]:")
+                    .strip()
+                    .lower()
                 )
 
-                start_line, indentation = utils.find_starting_line_and_indent(
-                    doc.metadata["filename"], doc.page_content
-                )
+                if choice == "r":
+                    memory.clear()
+                    print("Chat history cleared.")
+            else:
+                print("Invalid action.")
+                exit()
 
-                syntax = Syntax(
-                    indentation + doc.page_content,
-                    language.value,
-                    theme="monokai",
-                    line_numbers=True,
-                    start_line=start_line,
-                    indent_guides=True,
-                )
-                print(doc.metadata["filename"] + " -> " + doc.metadata["method_name"])
-                console.print(syntax)
-                print()
-
-            choice = input("[?] (C)ontinue search or (E)xit [C]:").strip().lower()
-
-        elif args.action == "chat":
-            question = input("💬 Ask anything about the codebase: ")
-            spinner = yaspin(text="🤖 Processing...", color="green")
-            spinner.start()
-            result = qa(question)
-            spinner.stop()
-            markdown = Markdown(result["answer"])
-            console.print(markdown)
-
-            choice = (
-                input("[?] (C)ontinue chat, (R)eset chat or (E)xit [C]:")
-                .strip()
-                .lower()
-            )
-
-            if choice == "r":
-                memory.clear()
-                print("Chat history cleared.")
-
-        if choice == "" or choice == "c":
-            continue
-        elif choice == "e":
-            break
-        else:
-            print("Invalid choice. Please enter 'C', 'E', or 'R'.")
+            if choice == "" or choice == "c":
+                continue
+            elif choice == "e":
+                break
+            else:
+                print("Invalid choice. Please enter 'C', 'E', or 'R'.")

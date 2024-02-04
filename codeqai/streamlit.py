@@ -1,18 +1,13 @@
-import os
 import subprocess
 import time
 
 import streamlit as st
-from langchain.chains import ConversationalRetrievalChain
 from langchain.memory import ConversationSummaryMemory
 
 from codeqai import codeparser, repo, utils
+from codeqai.bootstrap import bootstrap
 from codeqai.cache import save_vector_cache
 from codeqai.config import load_config
-from codeqai.constants import EmbeddingsModel, LlmHost
-from codeqai.embeddings import Embeddings
-from codeqai.llm import LLM
-from codeqai.vector_store import VectorStore
 
 
 def semantic_search(repo_name: str):
@@ -39,7 +34,7 @@ def semantic_search(repo_name: str):
             )
 
 
-# TODO use artificial stream until
+# TODO use artificial stream until added to conversational-retrieval-chain
 def stream_response(response: str):
     for word in response.split():
         yield word + " "
@@ -81,30 +76,9 @@ def chat(memory: ConversationSummaryMemory, repo_name: str):
 
 
 config = load_config()
-repo_name = repo.get_git_root(os.getcwd()).split("/")[-1]
+repo_name = repo.repo_name()
 
-embeddings_model = Embeddings(
-    model=EmbeddingsModel[config["embeddings"].upper().replace("-", "_")],
-    deployment=(
-        config["embeddings-deployment"] if "embeddings-deployment" in config else None
-    ),
-)
-
-vector_store = VectorStore(repo_name, embeddings=embeddings_model.embeddings)
-vector_store.load_documents()
-
-llm = LLM(
-    llm_host=LlmHost[config["llm-host"].upper().replace("-", "_")],
-    chat_model=config["chat-model"],
-    deployment=config["model-deployment"] if "model-deployment" in config else None,
-)
-memory = ConversationSummaryMemory(
-    llm=llm.chat_model, memory_key="chat_history", return_messages=True
-)
-qa = ConversationalRetrievalChain.from_llm(
-    llm.chat_model, retriever=vector_store.retriever, memory=memory
-)
-
+vector_store, memory, qa = bootstrap(config, repo_name)
 
 selected_chat = st.sidebar.radio("Select Mode", ["Search", "Chat"])
 if st.sidebar.button("Sync with current git checkout"):

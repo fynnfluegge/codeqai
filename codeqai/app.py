@@ -3,19 +3,17 @@ import os
 import subprocess
 
 from dotenv import dotenv_values, load_dotenv
-from langchain.chains import ConversationalRetrievalChain
-from langchain.memory import ConversationSummaryMemory
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.syntax import Syntax
 from yaspin import yaspin
 
 from codeqai import codeparser, repo, utils
+from codeqai.bootstrap import bootstrap
 from codeqai.cache import create_cache_dir, get_cache_path, save_vector_cache
 from codeqai.config import create_config, get_config_path, load_config
 from codeqai.constants import EmbeddingsModel, LlmHost
 from codeqai.embeddings import Embeddings
-from codeqai.llm import LLM
 from codeqai.vector_store import VectorStore
 
 
@@ -107,7 +105,7 @@ def run():
     env_path = get_config_path().replace("config.yaml", ".env")
     env_loader(env_path, required_keys)
 
-    repo_name = repo.get_git_root(os.getcwd()).split("/")[-1]
+    repo_name = repo.repo_name()
 
     # init cache
     create_cache_dir()
@@ -137,31 +135,7 @@ def run():
     if args.action == "app":
         subprocess.run(["streamlit", "run", "codeqai/streamlit.py"])
     else:
-        vector_store = VectorStore(repo_name, embeddings=embeddings_model.embeddings)
-        vector_store.load_documents()
-
-        if args.action == "sync":
-            spinner = yaspin(text="🔧 Parsing codebase...", color="green")
-            files = repo.load_files()
-            documents = codeparser.parse_code_files(files)
-            vector_store.sync_documents(documents)
-            save_vector_cache(vector_store.vector_cache, f"{repo_name}.json")
-            spinner.stop()
-            print("✅ Vector store synced with current git checkout.")
-
-        llm = LLM(
-            llm_host=LlmHost[config["llm-host"].upper().replace("-", "_")],
-            chat_model=config["chat-model"],
-            deployment=(
-                config["model-deployment"] if "model-deployment" in config else None
-            ),
-        )
-        memory = ConversationSummaryMemory(
-            llm=llm.chat_model, memory_key="chat_history", return_messages=True
-        )
-        qa = ConversationalRetrievalChain.from_llm(
-            llm.chat_model, retriever=vector_store.retriever, memory=memory
-        )
+        vector_store, memory, qa = bootstrap(config, repo_name, embeddings_model)
         console = Console()
         while True:
             choice = None

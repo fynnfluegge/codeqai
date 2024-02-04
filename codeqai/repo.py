@@ -4,6 +4,10 @@ import subprocess
 from git.repo import Repo
 
 
+def repo_name():
+    return get_git_root(os.getcwd()).split("/")[-1]
+
+
 def get_git_root(path):
     git_repo = Repo(path, search_parent_directories=True)
     git_root = git_repo.git.rev_parse("--show-toplevel")

@@ -52,6 +52,11 @@ Synchronize vector store with current git checkout:
 ```
 codeqai sync
 ```
+Start Streamlit app:
+
+```
+codeqai app
+```
 
 At first usage, the repository will be indexed with the configured embeddings model which might take a moment.
 

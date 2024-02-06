@@ -33,6 +33,11 @@ class TreesitterPython(Treesitter):
         for child in node.children:
             if child.type == self.method_declaration_identifier:
                 methods.append(child)
+            if child.type == "class_definition":
+                class_body = child.children[-1]
+                for child_node in class_body.children:
+                    if child_node.type == self.method_declaration_identifier:
+                        methods.append(child_node)
         return methods
 
     def _query_doc_comment(self, node: tree_sitter.Node):

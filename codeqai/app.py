@@ -127,6 +127,9 @@ def run():
 
     # check if faiss.index exists
     if not os.path.exists(os.path.join(get_cache_path(), f"{repo_name}.faiss.bytes")):
+        print(
+            f"No vector store found for {utils.get_bold_text(repo_name)}. Initial indexing may take a few minutes."
+        )
         spinner = yaspin(text="🔧 Parsing codebase...", color="green")
         spinner.start()
         files = repo.load_files()
@@ -151,13 +154,10 @@ def run():
         spinner.stop()
 
         if args.action == "sync":
-            spinner = yaspin(text="🔧 Parsing codebase...", color="green")
-            files = repo.load_files()
-            documents = codeparser.parse_code_files(files)
-            spinner.stop()
             spinner = yaspin(text="💾 Syncing vector store...", color="green")
             spinner.start()
-            vector_store.sync_documents(documents)
+            files = repo.load_files()
+            vector_store.sync_documents(files)
             save_vector_cache(vector_store.vector_cache, f"{repo_name}.json")
             spinner.stop()
             print("✅ Vector store synced with current git checkout.")

@@ -1,7 +1,7 @@
 import subprocess
 import sys
 
-from tests.fixtures.vector_entries import (modified_vector_entries,
+from tests.fixtures.vector_entries import (file_names, modified_vector_entries,
                                            vector_cache, vector_entries)
 
 

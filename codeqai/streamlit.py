@@ -83,8 +83,7 @@ vector_store, memory, qa = bootstrap(config, repo_name)
 selected_chat = st.sidebar.radio("Select Mode", ["Search", "Chat"])
 if st.sidebar.button("Sync with current git checkout"):
     files = repo.load_files()
-    documents = codeparser.parse_code_files(files)
-    vector_store.sync_documents(documents)
+    vector_store.sync_documents(files)
     save_vector_cache(vector_store.vector_cache, f"{repo_name}.json")
     st.sidebar.write(
         "✅ Synced with git commit hash\n"

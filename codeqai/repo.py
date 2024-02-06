@@ -35,7 +35,8 @@ def load_files():
         for file in files:
             file_ext = os.path.splitext(file)[1]
             if any(whitelist == file_ext for whitelist in WHITELIST_FILES):
-                file_list.append(os.path.join(root, file))
+                if file not in BLACKLIST_FILES:
+                    file_list.append(os.path.join(root, file))
 
     return file_list
 
@@ -61,6 +62,7 @@ def get_commit_hash(file_path):
 
 BLACKLIST_DIR = [
     "__pycache__",
+    ".pytest_cache",
     ".venv",
     ".git",
     ".idea",
@@ -112,4 +114,9 @@ WHITELIST_FILES = [
     ".rst",
     ".md",
     ".hs",
+]
+BLACKLIST_FILES = [
+    "package-lock.json",
+    "package.json",
+    "__init__.py",
 ]

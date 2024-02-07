@@ -27,7 +27,7 @@ class TreesitterRuby(Treesitter):
                 and doc_comment_node.prev_named_sibling.type == self.doc_comment_identifier
             ):
                 doc_comment_node = doc_comment_node.prev_named_sibling
-                doc_comment.append(doc_comment_node.text.decode())
+                doc_comment.insert(0, doc_comment_node.text.decode())
             methods.append({"method": node, "doc_comment": "\n".join(doc_comment)})
         else:
             for child in node.children:

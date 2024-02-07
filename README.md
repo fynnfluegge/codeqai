@@ -52,19 +52,34 @@ Synchronize vector store with current git checkout:
 ```
 codeqai sync
 ```
+Start Streamlit app:
+
+```
+codeqai app
+```
 
 At first usage, the repository will be indexed with the configured embeddings model which might take a moment.
 
 ## 📋 Requirements
 
-- Python >= 3.9
+- Python >=3.9,<3.12
 
 ## 📦 Installation
-Install and run in one step:
+Install in an isolated environment with `pipx`:
 ```
-pipx run --spec codeqai codeqai configure
+pipx install codeqai
 ```
-You can also install codeqai through PyPI with `pip install codeqai`. However, it is recommended to use pipx instead to benefit from isolated environments.
+⚠ Make sure pipx is using Python >=3.9,<3.12.  
+To specify the Python version explicitly with pipx, activate the desired Python version (e.g. with `pyenv shell 3.X.X`) and intall with:
+```
+pipx install codeqai --python $(which python)
+```
+If you are still facing issues using pipx you can also install directly from source through PyPI with:
+```
+pip install codeqai
+```
+However, it is recommended to use pipx to benefit from isolated environments for the dependencies.  
+Visit the [Troubleshooting](https://github.com/fynnfluegge/codeqai?tab=readme-ov-file#-troubleshooting) section for solutions of known issues during installation.
 
 > [!NOTE]  
 > Some packages are not installed by default. At first usage it is asked to install `faiss-cpu` or `faiss-gpu`. Faiss-gpu is recommended if the hardware supports CUDA 7.5+.
@@ -81,7 +96,7 @@ codeqai configure
 the configuration process is initiated, where the embeddings and llms can be chosen.
 
 > [!IMPORTANT]  
-> If you want to change the embeddings model in the configuration later, make sure to delete the old files from `~/.cache/codeqai`.
+> If you want to change the embeddings model in the configuration later, delete the cached files in `~/.cache/codeqai`.
 > Afterwards the vector store files are created again with the recent configured embeddings model. This is neccessary since the similarity search does not work if the models differ.
 
 ## 🌐 Remote models
@@ -107,16 +122,6 @@ export OPENAI_API_VERSION = "2023-05-15"
 > [!NOTE]  
 > To change the environment variables later, update the `~/.config/codeqai/.env` manually.
 
-## 💡 How it works
-
-The entire git repo is parsed with treesitter to extract all methods with documentations and saved to a local FAISS vector database with either sentence-transformers, instructor-embeddings or OpenAI's text-embedding-ada-002.
-The vector database is saved to a file on your system and will be loaded later again after further usage.  
-Afterwards it is possible to do semantic search on the codebase based on the embeddings model.  
-To chat with the codebase locally llama.cpp or Ollama is used by specifying the desired model.
-Using llama.cpp the specified model needs to be available on the system in advance.
-Using Ollama the Ollama container with the desired model needs to be running locally in advance on port 11434.
-Also OpenAI or Azure-OpenAI can be used for remote chat models.
-
 ## 📚 Supported Languages
 
 - [x] Python
@@ -129,6 +134,19 @@ Also OpenAI or Azure-OpenAI can be used for remote chat models.
 - [x] C++
 - [x] C
 - [x] C#
+
+## 💡 How it works
+
+The entire git repo is parsed with treesitter to extract all methods with documentations and saved to a local FAISS vector database with either sentence-transformers, instructor-embeddings or OpenAI's text-embedding-ada-002.  
+The vector database is saved to a file on your system and will be loaded later again after further usage.
+Afterwards it is possible to do semantic search on the codebase based on the embeddings model.  
+To chat with the codebase locally llama.cpp or Ollama is used by specifying the desired model.
+For synchronization of recent changes in the repository, the git commit hashes of each file along with the vector Ids are saved to a cache.
+When synchronizing the vector database with the latest git state, the cached commit hashes are compared to the current git hash of each file in the repository.
+If the git commit hashes differ, the related vectors are deleted from the database and inserted again after recreating the vector embeddings.
+Using llama.cpp the specified model needs to be available on the system in advance.
+Using Ollama the Ollama container with the desired model needs to be running locally in advance on port 11434.
+Also OpenAI or Azure-OpenAI can be used for remote chat models.
 
 ## ？FAQ
 
@@ -145,6 +163,32 @@ will download the `codellama-13b-python.Q5_K_M` model. After the download has fi
 
 > [!IMPORTANT]  
 > `llama.cpp` compatible models must be in the `.gguf` format.
+
+## 🛟 Troubleshooting
+- ### During installation with `pipx`
+  ```
+  pip failed to build package: tiktoken
+
+  Some possibly relevant errors from pip install:
+    error: subprocess-exited-with-error
+    error: can't find Rust compiler
+  ```
+  Make sure the rust compiler is installed on your system from [here](https://www.rust-lang.org/tools/install).
+  
+- ### During installation of `faiss`
+  ```
+  × Building wheel for faiss-cpu (pyproject.toml) did not run successfully.
+  │ exit code: 1
+  ╰─> [12 lines of output]
+      running bdist_wheel
+      ...
+  note: This error originates from a subprocess, and is likely not a problem with pip.
+  ERROR: Failed building wheel for faiss-cpu
+  Failed to build faiss-cpu
+  ERROR: Could not build wheels for faiss-cpu, which is required to install pyproject.toml-based projects
+  ```
+  Make sure to have codeqai installed with Python <3.12. There is no faiss wheel available yet for Python 3.12.
+
 
 ## ✨ Contributing
 

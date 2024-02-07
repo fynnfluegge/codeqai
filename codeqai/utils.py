@@ -52,7 +52,7 @@ def get_file_extension(file_name: str) -> str:
     return os.path.splitext(file_name)[-1]
 
 
-def get_langchain_language(language: Language) -> text_splitter.Language:
+def get_langchain_language(language: Language):
     if language == Language.PYTHON:
         return text_splitter.Language.PYTHON
     elif language == Language.JAVASCRIPT:
@@ -72,11 +72,11 @@ def get_langchain_language(language: Language) -> text_splitter.Language:
     elif language == Language.C_SHARP:
         return text_splitter.Language.CSHARP
     elif language == Language.HASKELL:
-        return text_splitter.Language.HASKELL # PR for Haskell support in text_splitter module - https://github.com/langchain-ai/langchain/pull/16191
+        return text_splitter.Language.HASKELL
     elif language == Language.RUBY:
         return text_splitter.Language.RUBY
     else:
-        return text_splitter.Language.UNKNOWN
+        return None
 
 
 def get_bold_text(text):

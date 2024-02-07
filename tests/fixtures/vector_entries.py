@@ -5,6 +5,16 @@ from codeqai.cache import VectorCache
 
 
 @pytest.fixture
+def file_names():
+    return [
+        "fixed_test.py",
+        "test.py",
+        "modified_test.py",
+        "new_test.py",
+    ]
+
+
+@pytest.fixture
 def vector_entries():
     return [
         Document(

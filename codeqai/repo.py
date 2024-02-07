@@ -4,6 +4,10 @@ import subprocess
 from git.repo import Repo
 
 
+def repo_name():
+    return get_git_root(os.getcwd()).split("/")[-1]
+
+
 def get_git_root(path):
     git_repo = Repo(path, search_parent_directories=True)
     git_root = git_repo.git.rev_parse("--show-toplevel")
@@ -31,7 +35,8 @@ def load_files():
         for file in files:
             file_ext = os.path.splitext(file)[1]
             if any(whitelist == file_ext for whitelist in WHITELIST_FILES):
-                file_list.append(os.path.join(root, file))
+                if file not in BLACKLIST_FILES:
+                    file_list.append(os.path.join(root, file))
 
     return file_list
 
@@ -57,6 +62,7 @@ def get_commit_hash(file_path):
 
 BLACKLIST_DIR = [
     "__pycache__",
+    ".pytest_cache",
     ".venv",
     ".git",
     ".idea",
@@ -109,4 +115,9 @@ WHITELIST_FILES = [
     ".md",
     ".hs",
     ".rb",
+]
+BLACKLIST_FILES = [
+    "package-lock.json",
+    "package.json",
+    "__init__.py",
 ]

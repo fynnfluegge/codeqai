@@ -11,20 +11,16 @@
 <div align="center">
 
 Search your codebase semantically or chat with it from cli. Keep the vector database superfast up to date to the latest code changes.
-100% local support without any dataleaks.
+100% local support without any dataleaks.  
 Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](https://github.com/tree-sitter/tree-sitter), [sentence-transformers](https://github.com/UKPLab/sentence-transformers), [instructor-embedding](https://github.com/xlang-ai/instructor-embedding),
-[faiss](https://github.com/facebookresearch/faiss), [lama.cpp](https://github.com/ggerganov/llama.cpp), [Ollama](https://github.com/jmorganca/ollama).
-
-
-https://github.com/fynnfluegge/codeqai/assets/16321871/2fa92c9b-8010-4487-adb0-c39aa6a5e762
-
+[faiss](https://github.com/facebookresearch/faiss), [lama.cpp](https://github.com/ggerganov/llama.cpp), [Ollama](https://github.com/jmorganca/ollama), [Streamlit](https://github.com/streamlit/streamlit).
 
 </div>
 
 ## ✨ Features
 
 - 🔎 &nbsp;Semantic code search
-- 💬 &nbsp;GPT-like chat with your codebase
+- 💬 &nbsp;GPT-like chat with your codebase  
 - ⚙️ &nbsp;Synchronize vector store and latest code changes with ease
 - 💻 &nbsp;100% local embeddings and llms
   - sentence-transformers, instructor-embeddings, llama.cpp, Ollama
@@ -36,23 +32,37 @@ https://github.com/fynnfluegge/codeqai/assets/16321871/2fa92c9b-8010-4487-adb0-c
 
 ## 🚀 Usage
 
-Start semantic search:
+#### Start semantic search:
 
 ```
 codeqai search
 ```
 
-Start chat dialog:
+<div align="center">
+  
+![ezgif-6-84a0da282f](https://github.com/fynnfluegge/codeqai/assets/16321871/142576f6-a2d4-41b9-a353-d82da78bc3b8)
+
+</div>
+
+#### Start chat dialog:
 
 ```
 codeqai chat
 ```
-Synchronize vector store with current git checkout:
+
+<div align="center">
+  
+![ezgif-6-6efdaecf45](https://github.com/fynnfluegge/codeqai/assets/16321871/84209b30-1940-4aa5-a9e2-03d699217adf)
+
+</div>
+
+#### Synchronize vector store with current git checkout:
 
 ```
 codeqai sync
 ```
-Start Streamlit app:
+
+#### Start Streamlit app:
 
 ```
 codeqai app
@@ -190,7 +200,7 @@ will download the `codellama-13b-python.Q5_K_M` model. After the download has fi
   Make sure to have codeqai installed with Python <3.12. There is no faiss wheel available yet for Python 3.12.
 
 
-## ✨ Contributing
+## 🌟 Contributing
 
 If you are missing a feature or facing a bug don't hesitate to open an issue or raise a PR.
 Any kind of contribution is highly appreciated!

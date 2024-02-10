@@ -146,7 +146,7 @@ def run():
         spinner.stop()
 
     if args.action == "app":
-        subprocess.run(["streamlit", "run", "codeqai/streamlit.py"])
+        subprocess.run(["streamlit", "run", "streamlit.py"])
     else:
         spinner = yaspin(text="💾 Loading vector store...", color="green")
         spinner.start()

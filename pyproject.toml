@@ -1,10 +1,11 @@
 [tool.poetry]
 name = "codeqai"
-version = "0.0.11"
+version = "0.0.12"
 description = ""
 authors = ["fynnfluegge <fynnfluegge@gmx.de>"]
 readme = "README.md"
 packages = [{ include = "codeqai" }]
+include = ["./streamlit/*"]
 
 [tool.poetry.dependencies]
 python = ">=3.9,<3.9.7 || >3.9.7,<3.12"

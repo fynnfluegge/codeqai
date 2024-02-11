@@ -3,10 +3,12 @@ import os
 import subprocess
 import warnings
 
+import click
 from dotenv import dotenv_values, load_dotenv
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.syntax import Syntax
+from streamlit.web import cli as stcli
 from yaspin import yaspin
 
 from codeqai import codeparser, repo, utils
@@ -146,7 +148,8 @@ def run():
         spinner.stop()
 
     if args.action == "app":
-        subprocess.run(["streamlit", "run", "streamlit.py"])
+        print("Starting CodeQAI streamlit app...")
+        run_streamlit()
     else:
         spinner = yaspin(text="💾 Loading vector store...", color="green")
         spinner.start()
@@ -226,3 +229,16 @@ def run():
                 break
             else:
                 print("Invalid choice. Please enter 'C', 'E', or 'R'.")
+
+
+@click.group()
+def run_streamlit():
+    pass
+
+
+@run_streamlit.command("app")
+def main_streamlit():
+    dirname = os.path.dirname(__file__)
+    filename = os.path.join(dirname, "streamlit.py")
+    args = []
+    stcli._main_run(filename, args)

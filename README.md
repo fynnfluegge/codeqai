@@ -40,7 +40,7 @@ codeqai search
 
 <div align="center">
   
-![ezgif-6-84a0da282f](https://github.com/fynnfluegge/codeqai/assets/16321871/142576f6-a2d4-41b9-a353-d82da78bc3b8)
+<img src="https://github.com/fynnfluegge/codeqai/assets/16321871/142576f6-a2d4-41b9-a353-d82da78bc3b8" width="800">
 
 </div>
 
@@ -51,8 +51,8 @@ codeqai chat
 ```
 
 <div align="center">
-  
-![ezgif-6-6efdaecf45](https://github.com/fynnfluegge/codeqai/assets/16321871/84209b30-1940-4aa5-a9e2-03d699217adf)
+
+<img src="https://github.com/fynnfluegge/codeqai/assets/16321871/84209b30-1940-4aa5-a9e2-03d699217adf" width="800">
 
 </div>
 
@@ -67,8 +67,15 @@ codeqai sync
 ```
 codeqai app
 ```
+<div align="center">
+  
+  <img src="https://github.com/fynnfluegge/codeqai/assets/16321871/3a9105f1-066a-4cbd-a096-c8a7bd2068d3" width="800">
+  
+</div>
 
-At first usage, the repository will be indexed with the configured embeddings model which might take a moment.
+
+> [!NOTE]
+> At first usage, the repository will be indexed with the configured embeddings model which might take a while.
 
 ## 📋 Requirements
 

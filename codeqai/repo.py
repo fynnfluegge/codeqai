@@ -114,6 +114,7 @@ WHITELIST_FILES = [
     ".rst",
     ".md",
     ".hs",
+    ".rb",
 ]
 BLACKLIST_FILES = [
     "package-lock.json",

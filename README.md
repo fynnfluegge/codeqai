@@ -20,7 +20,7 @@ Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](
 ## ✨ Features
 
 - 🔎 &nbsp;Semantic code search
-- 💬 &nbsp;GPT-like chat with your codebase  
+- 💬 &nbsp;GPT-like chat with your codebase
 - ⚙️ &nbsp;Synchronize vector store and latest code changes with ease
 - 💻 &nbsp;100% local embeddings and llms
   - sentence-transformers, instructor-embeddings, llama.cpp, Ollama
@@ -67,12 +67,12 @@ codeqai sync
 ```
 codeqai app
 ```
+
 <div align="center">
   
   <img src="https://github.com/fynnfluegge/codeqai/assets/16321871/3a9105f1-066a-4cbd-a096-c8a7bd2068d3" width="800">
   
 </div>
-
 
 > [!NOTE]
 > At first usage, the repository will be indexed with the configured embeddings model which might take a while.
@@ -82,19 +82,26 @@ codeqai app
 - Python >=3.9,<3.12
 
 ## 📦 Installation
+
 Install in an isolated environment with `pipx`:
+
 ```
 pipx install codeqai
 ```
+
 ⚠ Make sure pipx is using Python >=3.9,<3.12.  
 To specify the Python version explicitly with pipx, activate the desired Python version (e.g. with `pyenv shell 3.X.X`) and intall with:
+
 ```
 pipx install codeqai --python $(which python)
 ```
+
 If you are still facing issues using pipx you can also install directly from source through PyPI with:
+
 ```
 pip install codeqai
 ```
+
 However, it is recommended to use pipx to benefit from isolated environments for the dependencies.  
 Visit the [Troubleshooting](https://github.com/fynnfluegge/codeqai?tab=readme-ov-file#-troubleshooting) section for solutions of known issues during installation.
 
@@ -151,6 +158,7 @@ export OPENAI_API_VERSION = "2023-05-15"
 - [x] C++
 - [x] C
 - [x] C#
+- [x] Ruby
 
 ## 💡 How it works
 
@@ -182,7 +190,9 @@ will download the `codellama-13b-python.Q5_K_M` model. After the download has fi
 > `llama.cpp` compatible models must be in the `.gguf` format.
 
 ## 🛟 Troubleshooting
+
 - ### During installation with `pipx`
+
   ```
   pip failed to build package: tiktoken
 
@@ -190,8 +200,9 @@ will download the `codellama-13b-python.Q5_K_M` model. After the download has fi
     error: subprocess-exited-with-error
     error: can't find Rust compiler
   ```
+
   Make sure the rust compiler is installed on your system from [here](https://www.rust-lang.org/tools/install).
-  
+
 - ### During installation of `faiss`
   ```
   × Building wheel for faiss-cpu (pyproject.toml) did not run successfully.
@@ -205,7 +216,6 @@ will download the `codellama-13b-python.Q5_K_M` model. After the download has fi
   ERROR: Could not build wheels for faiss-cpu, which is required to install pyproject.toml-based projects
   ```
   Make sure to have codeqai installed with Python <3.12. There is no faiss wheel available yet for Python 3.12.
-
 
 ## 🌟 Contributing
 

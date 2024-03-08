@@ -16,6 +16,7 @@ class Language(Enum):
     SCALA = "scala"
     LUA = "lua"
     HASKELL = "haskell"
+    RUBY = "ruby"
     UNKNOWN = "unknown"
 
 

@@ -8,5 +8,4 @@ class TreesitterGo(Treesitter):
         super().__init__(Language.GO, "function_declaration", "identifier", "comment")
 
 
-# Register the TreesitterJava class in the registry
 TreesitterRegistry.register_treesitter(Language.GO, TreesitterGo)

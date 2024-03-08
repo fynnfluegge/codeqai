@@ -44,5 +44,4 @@ class TreesitterRust(Treesitter):
         return methods
 
 
-# Register the TreesitterJava class in the registry
 TreesitterRegistry.register_treesitter(Language.RUST, TreesitterRust)

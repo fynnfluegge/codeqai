@@ -1,7 +1,5 @@
-import json
 import os
 import platform
-from pathlib import Path
 
 import inquirer
 import yaml
@@ -27,13 +25,13 @@ def get_config_path():
 
 
 def load_config():
-    with open(get_config_path(), "r") as config_file:
+    with open(get_config_path(), "r", encoding="utf-8") as config_file:
         config = yaml.safe_load(config_file)
     return config
 
 
 def save_config(config):
-    with open(get_config_path(), "w") as config_file:
+    with open(get_config_path(), "w", encoding="utf-8") as config_file:
         yaml.dump(config, config_file, default_flow_style=False)
 
 

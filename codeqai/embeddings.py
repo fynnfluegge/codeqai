@@ -1,7 +1,6 @@
 import inquirer
-from langchain.embeddings import (HuggingFaceEmbeddings,
-                                  HuggingFaceInstructEmbeddings)
-from langchain.embeddings.openai import OpenAIEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_openai import OpenAIEmbeddings
 
 from codeqai import utils
 from codeqai.constants import EmbeddingsModel
@@ -39,7 +38,9 @@ class Embeddings:
                 except ImportError:
                     self._install_instructor_embedding()
 
-                self.embeddings = HuggingFaceInstructEmbeddings()
+                self.embeddings = HuggingFaceEmbeddings(
+                    model_name="hkunlp/instructor-xl"
+                )
 
     def _install_sentence_transformers(self):
         question = [

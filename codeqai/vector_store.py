@@ -3,11 +3,12 @@ import os
 import inquirer
 from langchain.embeddings.base import Embeddings
 from langchain.schema import Document
-from langchain.vectorstores import FAISS
-from yaspin import yaspin
+from langchain_community.vectorstores import FAISS
 
 from codeqai import utils
 from codeqai.cache import VectorCache, get_cache_path, load_vector_cache
+from codeqai.codeparser import parse_code_files
+from codeqai.repo import get_commit_hash
 
 
 class VectorStore:
@@ -17,8 +18,6 @@ class VectorStore:
         self.install_faiss()
 
     def load_documents(self):
-        spinner = yaspin(text="💾 Loading vector store...", color="green")
-        spinner.start()
         with open(
             os.path.join(get_cache_path(), f"{self.name}.faiss.bytes"), "rb"
         ) as file:
@@ -28,13 +27,10 @@ class VectorStore:
             embeddings=self.embeddings, serialized=index
         )
         self.vector_cache = load_vector_cache(f"{self.name}.json")
-        spinner.stop()
         self.retriever = self.db.as_retriever(search_type="mmr", search_kwargs={"k": 8})
 
     def index_documents(self, documents: list[Document]):
         self.vector_cache = {}
-        spinner = yaspin(text="💾 Indexing vector store...", color="green")
-        spinner.start()
         self.db = FAISS.from_documents(documents, self.embeddings)
         index = self.db.serialize_to_bytes()
         with open(
@@ -60,52 +56,36 @@ class VectorStore:
                         document.metadata["commit_hash"],
                     )
 
-        spinner.stop()
         self.retriever = self.db.as_retriever(search_type="mmr", search_kwargs={"k": 8})
 
-    def sync_documents(self, documents: list[Document]):
-        spinner = yaspin(text="💾 Syncing vector store...", color="green")
-        spinner.start()
-
+    def sync_documents(self, files):
         new_filenames = set()
-        modified_filenames = set()
-
-        for document in documents:
-            new_filenames.add(document.metadata["filename"])
+        for file in files:
+            filename = os.path.basename(file)
+            new_filenames.add(filename)
+            commit_hash = get_commit_hash(file)
             # Check if the document is already present in the vector cache
             # if yes, then check if the document has been modified or not
-            if document.metadata["filename"] in self.vector_cache:
+            if filename in self.vector_cache:
                 # Check if the document has been modified, if yes delete all old vectors and add new vector
-                if (
-                    self.vector_cache[document.metadata["filename"]].commit_hash
-                    != document.metadata["commit_hash"]
-                ):
-                    modified_filenames.add(document.metadata["filename"])
+                if self.vector_cache[filename].commit_hash != commit_hash:
                     # This will delete all the vectors associated with the document
                     # incluing db.index_to_docstore_id, db.docstore and db.index
-                    self.db.delete(
-                        self.vector_cache[document.metadata["filename"]].vector_ids
-                    )
+                    try:
+                        self.db.delete(self.vector_cache[filename].vector_ids)
+                    except Exception as e:
+                        print(f"Error deleting vectors for file {filename}: {e}")
+
                     # Add the new document to the vector store and recreate the vector cache entry
-                    self.db.add_documents([document])
-                    self.vector_cache[document.metadata["filename"]] = VectorCache(
-                        document.metadata["filename"],
-                        [
-                            self.db.index_to_docstore_id[
-                                len(self.db.index_to_docstore_id) - 1
-                            ]
-                        ],
-                        document.metadata["commit_hash"],
+                    self.vector_cache[filename] = VectorCache(
+                        filename,
+                        [],
+                        commit_hash,
                     )
-                # In this case the document was already present.
-                # Now it needs to be further checkd if the document has been modified or not
-                # since the commit hash might has been replaced already in the first if condition
-                else:
-                    if document.metadata["filename"] in modified_filenames:
+                    documents = parse_code_files([file])
+                    for document in documents:
                         self.db.add_documents([document])
-                        self.vector_cache[
-                            document.metadata["filename"]
-                        ].vector_ids.append(
+                        self.vector_cache[filename].vector_ids.append(
                             self.db.index_to_docstore_id[
                                 len(self.db.index_to_docstore_id) - 1
                             ]
@@ -113,34 +93,39 @@ class VectorStore:
 
             # if no, then create a new entry in the vector cache and add the document to the vector store
             else:
-                self.db.add_documents([document])
-                self.vector_cache[document.metadata["filename"]] = VectorCache(
-                    document.metadata["filename"],
-                    [
+                self.vector_cache[filename] = VectorCache(
+                    filename,
+                    [],
+                    commit_hash,
+                )
+                documents = parse_code_files([file])
+                for document in documents:
+                    self.db.add_documents([document])
+                    self.vector_cache[filename].vector_ids.append(
                         self.db.index_to_docstore_id[
                             len(self.db.index_to_docstore_id) - 1
                         ]
-                    ],
-                    document.metadata["commit_hash"],
-                )
+                    )
 
         # Remove old documents from the vector store
-        old_filenames = []
+        deleted_files = []
         for cache_item in self.vector_cache.values():
             if cache_item.filename not in new_filenames:
-                self.db.delete(cache_item.vector_ids)
-                old_filenames.append(cache_item.filename)
+                try:
+                    self.db.delete(cache_item.vector_ids)
+                except Exception as e:
+                    print(f"Error deleting vectors for file {cache_item.filename}: {e}")
+                deleted_files.append(cache_item.filename)
 
         # Remove old filenames from the vector cache
-        for old_filename in old_filenames:
-            self.vector_cache.pop(old_filename)
+        for deleted_file in deleted_files:
+            self.vector_cache.pop(deleted_file)
 
         index = self.db.serialize_to_bytes()
         with open(
             os.path.join(get_cache_path(), f"{self.name}.faiss.bytes"), "wb"
         ) as binary_file:
             binary_file.write(index)
-        spinner.stop()
 
     def similarity_search(self, query: str):
         return self.db.similarity_search(query, k=4)

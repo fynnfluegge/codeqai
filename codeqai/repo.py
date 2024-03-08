@@ -116,7 +116,6 @@ WHITELIST_FILES = [
     ".hs",
     ".rb",
 ]
-
 BLACKLIST_FILES = [
     "package-lock.json",
     "package.json",

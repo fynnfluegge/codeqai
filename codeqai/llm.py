@@ -20,10 +20,10 @@ class LLM:
                 temperature=0.9, max_tokens=2048, model=chat_model
             )
         elif llm_host == LlmHost.AZURE_OPENAI and deployment:
-            openai_ap_base = os.getenv("OPENAI_API_BASE")
-            if openai_ap_base:
+            azure_openai_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
+            if azure_openai_endpoint:
                 self.chat_model = AzureChatOpenAI(
-                    openai_api_base=openai_ap_base,
+                    azure_endpoint=azure_openai_endpoint,
                     temperature=0.9,
                     max_tokens=2048,
                     deployment_name=deployment,
@@ -31,7 +31,7 @@ class LLM:
                 )
             else:
                 raise ValueError(
-                    "Azure OpenAI requires environment variable OPENAI_API_BASE to be set."
+                    "Azure OpenAI requires environment variable AZURE_OPENAI_ENDPOINT to be set."
                 )
         elif llm_host == LlmHost.LLAMACPP:
             self.install_llama_cpp()

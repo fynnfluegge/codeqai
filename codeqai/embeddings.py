@@ -1,6 +1,6 @@
 import inquirer
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings, AzureOpenAIEmbeddings
 
 from codeqai import utils
 from codeqai.constants import EmbeddingsModel
@@ -17,7 +17,7 @@ class Embeddings:
                 client=None, model="text-embedding-ada-002"
             )
         elif model == EmbeddingsModel.AZURE_OPENAI and deployment:
-            self.embeddings = OpenAIEmbeddings(client=None, deployment=deployment)
+            self.embeddings = AzureOpenAIEmbeddings(client=None, deployment=deployment)
         else:
             try:
                 import sentence_transformers  # noqa: F401

@@ -138,7 +138,7 @@ export OPENAI_API_KEY = "your OpenAI api key"
 
 ```bash
 export OPENAI_API_TYPE = "azure"
-export OPENAI_API_BASE = "https://<your-endpoint>.openai.azure.com/"
+export AZURE_OPENAI_ENDPOINT = "https://<your-endpoint>.openai.azure.com/"
 export OPENAI_API_KEY = "your Azure OpenAI api key"
 export OPENAI_API_VERSION = "2023-05-15"
 ```

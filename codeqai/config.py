@@ -104,6 +104,7 @@ def create_config():
                 choices=[
                     LlmHost.OPENAI.value,
                     LlmHost.AZURE_OPENAI.value,
+                    LlmHost.ANTHROPIC.value,
                 ],
                 default=LlmHost.OPENAI.value,
             ),
@@ -177,6 +178,18 @@ def create_config():
                         "gpt-4",
                     ],
                     default="gpt-3.5-turbo",
+                ),
+            ]
+
+        elif config["llm-host"] == "Anthropic":
+            questions = [
+                inquirer.List(
+                    "chat-model",
+                    message="Which Anthropic chat model do you want to use?",
+                    choices=[
+                        "claude-3-opus-20240229",
+                    ],
+                    default="claude-3-opus-20240229",
                 ),
             ]
 

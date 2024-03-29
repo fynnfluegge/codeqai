@@ -1,6 +1,6 @@
 import inquirer
 from langchain_community.embeddings import HuggingFaceEmbeddings
-from langchain_openai import OpenAIEmbeddings, AzureOpenAIEmbeddings
+from langchain_openai import AzureOpenAIEmbeddings, OpenAIEmbeddings
 
 from codeqai import utils
 from codeqai.constants import EmbeddingsModel

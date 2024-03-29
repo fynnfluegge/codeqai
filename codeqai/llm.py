@@ -5,7 +5,7 @@ import sys
 import inquirer
 from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain_community.chat_models import AzureChatOpenAI
+from langchain_community.chat_models import AzureChatOpenAI, ChatAnthropic
 from langchain_community.llms import LlamaCpp, Ollama
 from langchain_openai import ChatOpenAI
 
@@ -33,6 +33,10 @@ class LLM:
                 raise ValueError(
                     "Azure OpenAI requires environment variable AZURE_OPENAI_ENDPOINT to be set."
                 )
+        elif llm_host == LlmHost.ANTHROPIC:
+            self.chat_model = ChatAnthropic(
+                temperature=0.9, max_tokens=2048, model_name=chat_model
+            )
         elif llm_host == LlmHost.LLAMACPP:
             self.install_llama_cpp()
             self.chat_model = LlamaCpp(

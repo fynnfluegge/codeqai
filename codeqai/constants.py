@@ -33,3 +33,4 @@ class LlmHost(Enum):
     OLLAMA = "Ollama"
     OPENAI = "OpenAI"
     AZURE_OPENAI = "Azure-OpenAI"
+    ANTHROPIC = "Anhtropic"

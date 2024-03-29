@@ -110,6 +110,10 @@ def run():
                 "OPENAI_API_VERSION",
             ]
         )
+
+    if config["llm-host"] == LlmHost.ANTHROPIC.value:
+        required_keys.append("ANTHROPIC_API_KEY")
+
     env_path = get_config_path().replace("config.yaml", ".env")
     env_loader(env_path, required_keys)
 

@@ -188,6 +188,8 @@ def create_config():
                     message="Which Anthropic chat model do you want to use?",
                     choices=[
                         "claude-3-opus-20240229",
+                        "claude-3-sonnet-20240229",
+                        "claude-3-haiku-20240307",
                     ],
                     default="claude-3-opus-20240229",
                 ),

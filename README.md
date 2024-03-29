@@ -24,7 +24,7 @@ Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](
 - ⚙️ &nbsp;Synchronize vector store and latest code changes with ease
 - 💻 &nbsp;100% local embeddings and llms
   - sentence-transformers, instructor-embeddings, llama.cpp, Ollama
-- 🌐 &nbsp;OpenAI and Azure OpenAI support
+- 🌐 &nbsp;OpenAI, Azure OpenAI and Anthropic
 - 🌳 &nbsp;Treesitter integration
 
 > [!NOTE]  
@@ -141,6 +141,12 @@ export OPENAI_API_TYPE = "azure"
 export AZURE_OPENAI_ENDPOINT = "https://<your-endpoint>.openai.azure.com/"
 export OPENAI_API_KEY = "your Azure OpenAI api key"
 export OPENAI_API_VERSION = "2023-05-15"
+```
+
+### Anthropic
+
+```bash
+export ANTHROPIC_API_KEY="your Anthropic api key"
 ```
 
 > [!NOTE]  

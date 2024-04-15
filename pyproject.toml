@@ -21,9 +21,11 @@ tree-sitter-languages = "^1.7.0"
 rich = "^13.5.3"
 python-dotenv = "^1.0.0"
 streamlit = "^1.31.0"
-langchain-community = "^0.0.17"
+langchain-community = "^0.0.32"
 langchain-openai = "^0.0.5"
 click = "^8.1.7"
+langchain-core = "^0.1.42"
+langchain-anthropic = "^0.1.8"
 
 [tool.poetry.scripts]
 codeqai = "codeqai.__main__:main"

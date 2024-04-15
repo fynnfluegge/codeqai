@@ -167,7 +167,7 @@ def create_config():
                 ),
             ]
 
-        elif config["llm-host"] == "OpenAI":
+        elif config["llm-host"] == LlmHost.OPENAI.value:
             questions = [
                 inquirer.List(
                     "chat-model",
@@ -181,7 +181,7 @@ def create_config():
                 ),
             ]
 
-        elif config["llm-host"] == "Anthropic":
+        elif config["llm-host"] == LlmHost.ANTHROPIC.value:
             questions = [
                 inquirer.List(
                     "chat-model",

@@ -5,7 +5,8 @@ import sys
 import inquirer
 from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
-from langchain_community.chat_models import AzureChatOpenAI, ChatAnthropic
+from langchain_anthropic import ChatAnthropic
+from langchain_community.chat_models import AzureChatOpenAI
 from langchain_community.llms import LlamaCpp, Ollama
 from langchain_openai import ChatOpenAI
 

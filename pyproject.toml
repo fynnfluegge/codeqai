@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "codeqai"
-version = "0.0.17"
+version = "0.0.18"
 description = ""
 authors = ["fynnfluegge <fynnfluegge@gmx.de>"]
 readme = "README.md"

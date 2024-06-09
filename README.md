@@ -239,7 +239,7 @@ conda env create -f environment.yml -n codeqai
 or by using `conda-lock` run:
 
 ```
-conda-lock install --name myenv conda-<YOUR_PLATFORM>.lock
+conda-lock install --name codeqai conda-<YOUR_PLATFORM>.lock
 ```
 
 Activate the environment and install dependencies with:

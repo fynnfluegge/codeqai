@@ -90,7 +90,7 @@ pipx install codeqai
 ```
 
 ⚠ Make sure pipx is using Python >=3.9,<3.12.  
-To specify the Python version explicitly with pipx, activate the desired Python version (e.g. with `pyenv shell 3.X.X`) and intall with:
+To specify the Python version explicitly with pipx, activate the desired Python version (e.g. with `pyenv shell 3.X.X`) and install with:
 
 ```
 pipx install codeqai --python $(which python)
@@ -227,3 +227,41 @@ will download the `codellama-13b-python.Q5_K_M` model. After the download has fi
 
 If you are missing a feature or facing a bug don't hesitate to open an issue or raise a PR.
 Any kind of contribution is highly appreciated!
+
+To build and run the project in development mode make sure to have `conda`, `conda-lock` or `poetry` installed.
+
+By using `conda` run:
+
+```
+conda env create -f environment.yml -n codeqai
+```
+
+or by using `conda-lock` run:
+
+```
+conda-lock install --name codeqai conda-<YOUR_PLATFORM>.lock
+```
+
+Activate the environment and install dependencies with:
+
+```
+conda activate codeqai && poetry install
+```
+
+By using `poetry` run:
+
+```
+poetry install && poetry shell
+```
+
+Run e.g. `codeqai chat` within development environment with:
+
+```
+poetry run codeqai chat
+```
+
+Run tests with:
+
+```
+poetry run pytest -s -vv
+```

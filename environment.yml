@@ -1,0 +1,13 @@
+name: codeqai-dev
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11.*
+  - mamba
+  - conda-lock
+  - pip
+  - poetry=1.6.*
+platforms:
+  - linux-64
+  - osx-64
+  - win-64

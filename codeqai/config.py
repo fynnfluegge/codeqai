@@ -176,6 +176,8 @@ def create_config():
                         "gpt-3.5-turbo",
                         "gpt-3.5-turbo-16k",
                         "gpt-4",
+                        "gpt-4-turbo",
+                        "gpt-4o",
                     ],
                     default="gpt-3.5-turbo",
                 ),

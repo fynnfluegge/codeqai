@@ -225,12 +225,20 @@ will download the `codellama-13b-python.Q5_K_M` model. After the download has fi
 
 ## 🌟 Contributing
 
-To build and run the project for development make sure to have `conda` or `poetry` installed on your system.
+To build and run the project in development mode make sure to have `conda`, `conda-lock` or `poetry` installed.
 
 By using `conda` run:
 
 ```
 conda env create -f environment.yml -n codeqai &&
+conda activate codeqai &&
+poetry install
+```
+
+or by using `conda-lock` run:
+
+```
+conda-lock install --name myenv conda-<YOUR_PLATFORM>.lock
 conda activate codeqai &&
 poetry install
 ```
@@ -241,7 +249,7 @@ By using `poetry` run:
 poetry install && poetry shell
 ```
 
-Run the `codeqai chat` within development environment with:
+Run e.g. `codeqai chat` within development environment with:
 
 ```
 poetry run codeqai chat

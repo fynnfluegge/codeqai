@@ -1,4 +1,4 @@
-name: codeqai-dev
+name: codeqai
 channels:
   - conda-forge
 dependencies:

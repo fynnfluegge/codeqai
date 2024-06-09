@@ -225,6 +225,9 @@ will download the `codellama-13b-python.Q5_K_M` model. After the download has fi
 
 ## 🌟 Contributing
 
+If you are missing a feature or facing a bug don't hesitate to open an issue or raise a PR.
+Any kind of con&&tribution is highly appreciated!
+
 To build and run the project in development mode make sure to have `conda`, `conda-lock` or `poetry` installed.
 
 By using `conda` run:
@@ -262,6 +265,3 @@ Run tests with:
 ```
 poetry run pytest -s -vv
 ```
-
-If you are missing a feature or facing a bug don't hesitate to open an issue or raise a PR.
-Any kind of con&&tribution is highly appreciated!

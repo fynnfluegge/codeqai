@@ -34,3 +34,10 @@ class LlmHost(Enum):
     OPENAI = "OpenAI"
     AZURE_OPENAI = "Azure-OpenAI"
     ANTHROPIC = "Anthropic"
+    DEEPSEEK = "Deepseek"
+    HUGGINGFACE = "Huggingface"
+
+
+class DatasetFormat(Enum):
+    ALPACA = "Alpaca"
+    CONVERSATIONAL = "Conversational"

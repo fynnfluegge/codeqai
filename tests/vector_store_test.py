@@ -47,7 +47,7 @@ def mock_get_commit_hash(file):
         return "1234567890"
 
 
-def parse_code_files(files):
+def parse_code_files_for_db(files):
     if files == ["test.py"]:
         return [
             Document(
@@ -102,7 +102,10 @@ def test_sync_documents(file_names, vector_entries, vector_cache, mocker):
     mocker.patch(
         "codeqai.vector_store.get_commit_hash", side_effect=mock_get_commit_hash
     )
-    mocker.patch("codeqai.vector_store.parse_code_files", side_effect=parse_code_files)
+    mocker.patch(
+        "codeqai.vector_store.parse_code_files_for_db",
+        side_effect=parse_code_files_for_db,
+    )
     Path(get_cache_path()).mkdir(parents=True, exist_ok=True)
     embeddings = FakeEmbeddings(size=1024)
     vector_store = VectorStore(name="test", embeddings=embeddings)

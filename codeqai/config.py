@@ -100,7 +100,7 @@ def create_config():
         questions = [
             inquirer.List(
                 "llm-host",
-                message="Which remote LLM do you want to use?",
+                message="Which remote LLM provider do you want to use?",
                 choices=[
                     LlmHost.OPENAI.value,
                     LlmHost.AZURE_OPENAI.value,
@@ -147,7 +147,7 @@ def create_config():
             questions = [
                 inquirer.Text(
                     "chat-model",
-                    message="Please enter the path to the LLM model",
+                    message="Please enter the path to the LLM",
                     default="",
                 ),
             ]
@@ -156,12 +156,22 @@ def create_config():
             questions = [
                 inquirer.List(
                     "chat-model",
-                    message="Which Ollama chat model do you want to use?",
+                    message="Which model do you want to use with Ollama?",
                     choices=[
-                        "llama2",
+                        "llama2:7b",
                         "llama2:13b",
-                        "llama2:70b",
-                        "codellama",
+                        "llama3.2:1b",
+                        "llama3.2:3b",
+                        "llama3.1:8b",
+                        "codellama:7b",
+                        "codellama:13b",
+                        "gemma2:9b",
+                        "gemma2:2b",
+                        "deepseek-r1:1.5b",
+                        "deepseek-r1:7b",
+                        "deepseek-r1:8b",
+                        "qwen2.5-coder:7b",
+                        "qwen2.5-coder:3b",
                     ],
                     default="llama2:13b",
                 ),
@@ -171,13 +181,16 @@ def create_config():
             questions = [
                 inquirer.List(
                     "chat-model",
-                    message="Which OpenAI chat model do you want to use?",
+                    message="Which OpenAI model do you want to use?",
                     choices=[
                         "gpt-3.5-turbo",
-                        "gpt-3.5-turbo-16k",
                         "gpt-4",
                         "gpt-4-turbo",
                         "gpt-4o",
+                        "gpt-4o-mini",
+                        "o1",
+                        "o1-mini",
+                        "o3-mini",
                     ],
                     default="gpt-3.5-turbo",
                 ),
@@ -187,13 +200,13 @@ def create_config():
             questions = [
                 inquirer.List(
                     "chat-model",
-                    message="Which Anthropic chat model do you want to use?",
+                    message="Which Anthropic model do you want to use?",
                     choices=[
-                        "claude-3-opus-20240229",
-                        "claude-3-sonnet-20240229",
-                        "claude-3-haiku-20240307",
+                        "claude-3-opus-latest",
+                        "claude-3-5-sonnet-latest",
+                        "claude-3-5-haiku-latest",
                     ],
-                    default="claude-3-opus-20240229",
+                    default="claude-3-opus-latest",
                 ),
             ]
 

@@ -75,8 +75,26 @@ def run():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "action",
-        choices=["app", "search", "chat", "configure", "sync"],
+        choices=[
+            "app",
+            "search",
+            "chat",
+            "configure",
+            "sync",
+            "export-dataset (experimental)",
+        ],
         help="Action to perform. 'search' will semantically search the codebase. 'chat' will chat with the codebase.",
+    )
+    parser.add_argument(
+        "--distillation",
+        action="store_true",
+        help="Use model distillation for finetuning dataset extraction.",
+    )
+    parser.add_argument(
+        "--format",
+        type=str,
+        default="Conversational",
+        help="Format of the finetuning dataset. Supported formats are Conversational and Alpaca. Default is Conversational format.",
     )
     args = parser.parse_args()
 
@@ -131,6 +149,12 @@ def run():
         ),
     )
 
+    if args.action == "extract-dataset":
+        repo_name = repo.repo_name()
+        files = repo.load_files()
+        documents = codeparser.parse_code_files_for_finetuning(files)
+        exit()
+
     # check if faiss.index exists
     if not os.path.exists(os.path.join(get_cache_path(), f"{repo_name}.faiss.bytes")):
         print(
@@ -139,7 +163,7 @@ def run():
         spinner = yaspin(text="🔧 Parsing codebase...", color="green")
         spinner.start()
         files = repo.load_files()
-        documents = codeparser.parse_code_files(files)
+        documents = codeparser.parse_code_files_for_db(files)
         spinner.stop()
         spinner = yaspin(text="💾 Indexing vector store...", color="green")
         vector_store = VectorStore(

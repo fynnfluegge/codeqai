@@ -7,7 +7,7 @@ from langchain_community.vectorstores import FAISS
 
 from codeqai import utils
 from codeqai.cache import VectorCache, get_cache_path, load_vector_cache
-from codeqai.codeparser import parse_code_files
+from codeqai.codeparser import parse_code_files_for_db
 from codeqai.repo import get_commit_hash
 
 
@@ -82,7 +82,7 @@ class VectorStore:
                         [],
                         commit_hash,
                     )
-                    documents = parse_code_files([file])
+                    documents = parse_code_files_for_db([file])
                     for document in documents:
                         self.db.add_documents([document])
                         self.vector_cache[filename].vector_ids.append(
@@ -98,7 +98,7 @@ class VectorStore:
                     [],
                     commit_hash,
                 )
-                documents = parse_code_files([file])
+                documents = parse_code_files_for_db([file])
                 for document in documents:
                     self.db.add_documents([document])
                     self.vector_cache[filename].vector_ids.append(

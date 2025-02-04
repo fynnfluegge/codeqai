@@ -1,3 +1,4 @@
+import ast
 import os
 
 from langchain.schema import Document
@@ -8,7 +9,7 @@ from codeqai.constants import Language
 from codeqai.treesitter.treesitter import Treesitter, TreesitterMethodNode
 
 
-def parse_code_files(code_files: list[str]) -> list[Document]:
+def parse_code_files_for_db(code_files: list[str]) -> list[Document]:
     documents = []
     code_splitter = None
     for code_file in code_files:
@@ -55,5 +56,38 @@ def parse_code_files(code_files: list[str]) -> list[Document]:
                         },
                     )
                     documents.append(document)
+
+    return documents
+
+
+def parse_code_files_for_finetuning(code_files: list[str]) -> list[dict]:
+    documents = []
+    for code_file in code_files:
+        with open(code_file, "r", encoding="utf-8") as file:
+            file_bytes = file.read().encode()
+
+            file_extension = utils.get_file_extension(code_file)
+            programming_language = utils.get_programming_language(file_extension)
+            if programming_language == Language.UNKNOWN:
+                continue
+
+            treesitter_parser = Treesitter.create_treesitter(programming_language)
+            treesitterNodes: list[TreesitterMethodNode] = treesitter_parser.parse(
+                file_bytes
+            )
+            for node in treesitterNodes:
+                method_source_code = node.method_source_code
+
+                if node.doc_comment and programming_language == Language.PYTHON:
+                    method_source_code = method_source_code.replace(
+                        node.doc_comment, ""
+                    )
+
+                document = {
+                    "code": method_source_code,
+                    "description": node.doc_comment,
+                    "language": programming_language,
+                }
+                documents.append(document)
 
     return documents

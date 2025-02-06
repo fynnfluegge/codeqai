@@ -39,5 +39,5 @@ class LlmHost(Enum):
 
 
 class DatasetFormat(Enum):
-    ALPACA = "Alpaca"
-    CONVERSATIONAL = "Conversational"
+    ALPACA = "alpaca"
+    CONVERSATIONAL = "conversational"

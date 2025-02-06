@@ -16,6 +16,7 @@ from codeqai.bootstrap import bootstrap
 from codeqai.cache import create_cache_dir, get_cache_path, save_vector_cache
 from codeqai.config import create_config, get_config_path, load_config
 from codeqai.constants import EmbeddingsModel, LlmHost
+from codeqai.dataset_extractor import DatesetExtractor
 from codeqai.embeddings import Embeddings
 from codeqai.vector_store import VectorStore
 
@@ -81,20 +82,21 @@ def run():
             "chat",
             "configure",
             "sync",
-            "export-dataset (experimental)",
+            "export-dataset",
         ],
         help="Action to perform. 'search' will semantically search the codebase. 'chat' will chat with the codebase.",
     )
     parser.add_argument(
         "--distillation",
         action="store_true",
+        default=False,
         help="Use model distillation for finetuning dataset extraction.",
     )
     parser.add_argument(
         "--format",
         type=str,
-        default="Conversational",
-        help="Format of the finetuning dataset. Supported formats are Conversational and Alpaca. Default is Conversational format.",
+        default="conversational",
+        help="Format of the finetuning dataset. Supported formats are conversational and alpaca. Default is Conversational format.",
     )
     args = parser.parse_args()
 
@@ -149,10 +151,12 @@ def run():
         ),
     )
 
-    if args.action == "extract-dataset":
+    if args.action == "export-dataset":
         repo_name = repo.repo_name()
         files = repo.load_files()
         documents = codeparser.parse_code_files_for_finetuning(files)
+        dateset_extractor = DatesetExtractor(args.format, args.distillation, documents)
+        dateset_extractor.export()
         exit()
 
     # check if faiss.index exists
@@ -181,7 +185,7 @@ def run():
     else:
         spinner = yaspin(text="💾 Loading vector store...", color="green")
         spinner.start()
-        vector_store, memory, qa = bootstrap(config, repo_name, embeddings_model)
+        vector_store, memory, qa, llm = bootstrap(config, repo_name, embeddings_model)
         spinner.stop()
 
         if args.action == "sync":

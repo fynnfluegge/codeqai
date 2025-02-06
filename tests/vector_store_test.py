@@ -1,8 +1,8 @@
 from pathlib import Path
 
 import pytest
-from langchain.embeddings import FakeEmbeddings
 from langchain.schema import Document
+from langchain_community.embeddings import FakeEmbeddings
 
 from codeqai.cache import get_cache_path
 from codeqai.vector_store import VectorStore

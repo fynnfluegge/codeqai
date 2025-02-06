@@ -84,6 +84,7 @@ def parse_code_files_for_finetuning(code_files: list[str]) -> list[dict]:
                     )
 
                 document = {
+                    "method_name": node.name,
                     "code": method_source_code,
                     "description": node.doc_comment,
                     "language": programming_language.value,

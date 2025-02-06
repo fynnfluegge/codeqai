@@ -1,10 +1,12 @@
 import json
 
+from yaspin import yaspin
+
 from codeqai.constants import DatasetFormat, LlmHost
 from codeqai.llm import LLM
 
 
-class DatesetExtractor:
+class DatasetExtractor:
     def __init__(
         self,
         format: DatasetFormat,
@@ -25,9 +27,9 @@ class DatesetExtractor:
 
     def export(self):
         if self.format == DatasetFormat.CONVERSATIONAL.value:
-            return self.export_conversational()
+            self.export_conversational()
         elif self.format == DatasetFormat.ALPACA.value:
-            return self.export_alpaca()
+            self.export_alpaca()
 
     def export_conversational(self):
         messages_list = []

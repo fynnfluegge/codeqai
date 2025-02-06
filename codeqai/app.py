@@ -16,7 +16,7 @@ from codeqai.bootstrap import bootstrap
 from codeqai.cache import create_cache_dir, get_cache_path, save_vector_cache
 from codeqai.config import create_config, get_config_path, load_config
 from codeqai.constants import EmbeddingsModel, LlmHost
-from codeqai.dataset_extractor import DatesetExtractor
+from codeqai.dataset_extractor import DatasetExtractor
 from codeqai.embeddings import Embeddings
 from codeqai.vector_store import VectorStore
 
@@ -152,11 +152,19 @@ def run():
     )
 
     if args.action == "export-dataset":
+        spinner = yaspin(
+            text=f"Extracting {args.format} Dataset...",
+            color="green",
+        )
+        spinner.start()
         repo_name = repo.repo_name()
         files = repo.load_files()
         documents = codeparser.parse_code_files_for_finetuning(files)
-        dateset_extractor = DatesetExtractor(args.format, args.distillation, documents)
+        dateset_extractor = DatasetExtractor(
+            args.format, args.distillation, documents, config
+        )
         dateset_extractor.export()
+        spinner.stop()
         exit()
 
     # check if faiss.index exists
@@ -185,7 +193,7 @@ def run():
     else:
         spinner = yaspin(text="💾 Loading vector store...", color="green")
         spinner.start()
-        vector_store, memory, qa, llm = bootstrap(config, repo_name, embeddings_model)
+        vector_store, memory, qa = bootstrap(config, repo_name, embeddings_model)
         spinner.stop()
 
         if args.action == "sync":

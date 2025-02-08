@@ -1,7 +1,5 @@
 import json
 
-from yaspin import yaspin
-
 from codeqai.constants import DatasetFormat, LlmHost
 from codeqai.llm import LLM
 
@@ -26,10 +24,13 @@ class DatasetExtractor:
         )
 
     def export(self):
+        print("Exporting dataset...")
         if self.format == DatasetFormat.CONVERSATIONAL.value:
             self.export_conversational()
         elif self.format == DatasetFormat.ALPACA.value:
             self.export_alpaca()
+        elif self.format == DatasetFormat.INSTRUCTION.value:
+            self.export_instruction()
 
     def export_conversational(self):
         messages_list = []
@@ -109,7 +110,43 @@ class DatasetExtractor:
         with open("alpaca_dataset.json", "w") as f:
             json.dump(alpaca_list, f, indent=4)
 
+    def export_instruction(self):
+        instructions_list = []
+        for code_snippet in self.code_snippets:
+            if code_snippet.get("description") is None:
+                if self.distillation:
+                    result = self.distill_docstring(code_snippet)
+                    if type(result) is str:
+                        docstring = result
+                    else:
+                        continue
+                else:
+                    continue
+            else:
+                docstring = code_snippet.get("description")
+
+            instruction = {
+                "prompt": "You are a "
+                + (code_snippet.get("language") or "programming")
+                + " expert. Write an implementation for the following description:\n"
+                + (docstring or ""),
+                "completion": code_snippet.get("code"),
+            }
+            instructions_list.append(instruction)
+            instruction = {
+                "prompt": "You are a "
+                + (code_snippet.get("language") or "programming")
+                + " expert. Explain the following code:\n"
+                + (code_snippet.get("code") or ""),
+                "completion": docstring,
+            }
+            instructions_list.append(instruction)
+
+        with open("instruction_dataset.json", "w") as f:
+            json.dump(instructions_list, f, indent=4)
+
     def distill_docstring(self, code_snippet):
+        print(f"Distilling {code_snippet.get('method_name')}...")
         prompt = (
             "You are a "
             + (code_snippet.get("language") or "programming")

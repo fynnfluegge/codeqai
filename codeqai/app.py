@@ -153,18 +153,18 @@ def run():
 
     if args.action == "export-dataset":
         spinner = yaspin(
-            text=f"Extracting {args.format} Dataset...",
+            text=f"Parsing codebase for {args.format} dataset export...",
             color="green",
         )
         spinner.start()
         repo_name = repo.repo_name()
         files = repo.load_files()
         documents = codeparser.parse_code_files_for_finetuning(files)
+        spinner.stop()
         dateset_extractor = DatasetExtractor(
             args.format, args.distillation, documents, config
         )
         dateset_extractor.export()
-        spinner.stop()
         exit()
 
     # check if faiss.index exists

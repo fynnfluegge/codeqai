@@ -1,5 +1,7 @@
 import json
 
+from yaspin import yaspin
+
 from codeqai.constants import DatasetFormat, LlmHost
 from codeqai.llm import LLM
 
@@ -27,10 +29,13 @@ class DatasetExtractor:
         print("Exporting dataset...")
         if self.format == DatasetFormat.CONVERSATIONAL.value:
             self.export_conversational()
+            print("Dataset exported to conversational_dataset.json")
         elif self.format == DatasetFormat.ALPACA.value:
             self.export_alpaca()
+            print("Dataset exported to alpaca_dataset.json")
         elif self.format == DatasetFormat.INSTRUCTION.value:
             self.export_instruction()
+            print("Dataset exported to instruction_dataset.json")
 
     def export_conversational(self):
         messages_list = []
@@ -146,7 +151,11 @@ class DatasetExtractor:
             json.dump(instructions_list, f, indent=4)
 
     def distill_docstring(self, code_snippet):
-        print(f"Distilling {code_snippet.get('method_name')}...")
+        spinner = yaspin(
+            text=f"Distilling {code_snippet.get('method_name')}...",
+            color="green",
+        )
+        spinner.start()
         prompt = (
             "You are a "
             + (code_snippet.get("language") or "programming")
@@ -158,4 +167,5 @@ class DatasetExtractor:
                 ("human", code_snippet.get("code") or ""),
             ]
         )
+        spinner.stop()
         return docstring.content

@@ -150,6 +150,26 @@ class DatasetExtractor:
         with open("instruction_dataset.json", "w") as f:
             json.dump(instructions_list, f, indent=4)
 
+    def export_completion(self):
+        completions_list = []
+        for code_snippet in self.code_snippets:
+            if code_snippet.get("description") is None:
+                if self.distillation:
+                    docstring = self.distill_docstring(code_snippet)
+                else:
+                    continue
+            else:
+                docstring = code_snippet.get("description")
+
+            completion = {
+                "input": docstring,
+                "output": code_snippet.get("code"),
+            }
+            completions_list.append(completion)
+
+        with open("completion_dataset.json", "w") as f:
+            json.dump(completions_list, f, indent=4)
+
     def distill_docstring(self, code_snippet):
         spinner = yaspin(
             text=f"Distilling {code_snippet.get('method_name')}...",

@@ -42,3 +42,4 @@ class DatasetFormat(Enum):
     ALPACA = "alpaca"
     CONVERSATIONAL = "conversational"
     INSTRUCTION = "instruction"
+    COMPLETION = "completion"

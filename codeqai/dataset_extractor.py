@@ -189,3 +189,24 @@ class DatasetExtractor:
         )
         spinner.stop()
         return docstring.content
+
+    def distill_code(self, code_snippet):
+        spinner = yaspin(
+            text=f"Distilling {code_snippet.get('method_name')}...",
+            color="green",
+        )
+        spinner.start()
+        prompt = (
+            "You are a "
+            + (code_snippet.get("language") or "programming")
+            + " expert. Split the following code into reasonable chunks and explain each chunk. "
+            + "Return a JSON object with a list of objects containing the code chunk with key 'code' and the explanation with key 'explanation'."
+        )
+        code = self.llm.chat_model.invoke(
+            [
+                ("system", prompt),
+                ("human", code_snippet.get("code") or ""),
+            ]
+        )
+        spinner.stop()
+        return code.content

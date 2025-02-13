@@ -56,7 +56,7 @@ class VectorStore:
         index_to_docstore_id = self.db.index_to_docstore_id
         for i in range(len(documents)):
             document = self.db.docstore.search(index_to_docstore_id[i])
-            if document:
+            if document and document is type(Document):
                 # Check if the document is already present in the vector cache
                 # if yes, then add the vector id to the vector cache entry
                 if self.vector_cache.get(document.metadata["filename"]):

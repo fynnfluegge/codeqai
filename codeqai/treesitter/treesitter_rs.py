@@ -10,6 +10,15 @@ class TreesitterRust(Treesitter):
         super().__init__(Language.RUST, "function_item", "identifier", "line_comment")
 
     def _query_all_methods(self, node: tree_sitter.Node):
+        """
+        Recursively queries all method nodes in the given syntax tree node.
+
+        Args:
+            node (tree_sitter.Node): The root node to start the query from.
+
+        Returns:
+            list: A list of dictionaries, each containing a method node and its associated doc comment (if any).
+        """
         methods = []
         if node.type == self.method_declaration_identifier:
             doc_comment_nodes = []

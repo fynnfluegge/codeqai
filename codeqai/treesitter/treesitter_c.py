@@ -10,6 +10,15 @@ class TreesitterC(Treesitter):
         super().__init__(Language.C, "function_definition", "identifier", "comment")
 
     def _query_method_name(self, node: tree_sitter.Node):
+        """
+        Queries the method name from the given syntax tree node.
+
+        Args:
+            node (tree_sitter.Node): The syntax tree node to query.
+
+        Returns:
+            str or None: The method name if found, otherwise None.
+        """
         if node.type == self.method_declaration_identifier:
             for child in node.children:
                 # if method returns pointer, skip pointer declarator

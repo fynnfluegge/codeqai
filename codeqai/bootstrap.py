@@ -8,6 +8,17 @@ from codeqai.vector_store import VectorStore
 
 
 def bootstrap(config, repo_name, embeddings_model=None):
+    """
+    Initializes the necessary components for the application.
+
+    Args:
+        config (dict): Configuration dictionary containing settings for embeddings and LLM.
+        repo_name (str): The name of the repository.
+        embeddings_model (Embeddings, optional): Pre-initialized embeddings model. Defaults to None.
+
+    Returns:
+        tuple: A tuple containing the vector store, memory, and QA chain.
+    """
     if embeddings_model is None:
         embeddings_model = Embeddings(
             model=EmbeddingsModel[config["embeddings"].upper().replace("-", "_")],

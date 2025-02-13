@@ -26,6 +26,7 @@ langchain-openai = "^0.1.0"
 click = "^8.1.7"
 langchain-core = "^0.1.42"
 langchain-anthropic = "^0.1.8"
+langchain-huggingface = "^0.0.3"
 
 [tool.poetry.scripts]
 codeqai = "codeqai.__main__:main"

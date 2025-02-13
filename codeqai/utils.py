@@ -1,6 +1,7 @@
 import os
 
 import langchain.text_splitter as text_splitter
+import tiktoken
 
 from codeqai.constants import Language
 from codeqai.repo import find_file_in_git_repo
@@ -80,10 +81,30 @@ def get_langchain_language(language: Language):
 
 
 def get_bold_text(text):
+    """
+    Returns the given text formatted in bold.
+
+    Args:
+        text (str): The text to be formatted.
+
+    Returns:
+        str: The text formatted in bold using ANSI escape codes.
+    """
     return f"\033[01m{text}\033[0m"
 
 
 def find_starting_line_and_indent(filename, code_snippet):
+    """
+    Finds the starting line number and indentation level of a code snippet within a file.
+
+    Args:
+        filename (str): The name of the file to search within.
+        code_snippet (str): The code snippet to find in the file.
+
+    Returns:
+        tuple: A tuple containing the starting line number (int) and the indentation level (str) of the code snippet.
+               If the file is not found or the code snippet is not found, returns (1, "").
+    """
     file_path = find_file_in_git_repo(filename)
     if file_path is not None:
         with open(file_path, "r") as file:
@@ -94,3 +115,18 @@ def find_starting_line_and_indent(filename, code_snippet):
                 file_content[:start_pos].split("\n")[-1],
             )
     return 1, ""
+
+
+def count_tokens(text, model="gpt-4"):
+    """
+    Counts the number of tokens in the given text using the specified model's tokenizer.
+
+    Args:
+        text (str): The text to be tokenized and counted.
+        model (str, optional): The model to use for tokenization. Defaults to "gpt-4".
+
+    Returns:
+        int: The number of tokens in the text.
+    """
+    enc = tiktoken.encoding_for_model(model)
+    return len(enc.encode(text))

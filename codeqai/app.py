@@ -84,19 +84,33 @@ def run():
             "sync",
             "export-dataset",
         ],
-        help="Action to perform. 'search' will semantically search the codebase. 'chat' will chat with the codebase.",
+        help="Action to perform. 'app' to start the streamlit app, 'search' to search the codebase, "
+        + "'chat' to chat with the model, 'configure' to start config wizard, "
+        + "'sync' to sync the vector store with the current git checkout, 'export-dataset' to export a dataset for model distillation.",
     )
     parser.add_argument(
-        "--distillation",
+        "--doc-distillation",
         action="store_true",
         default=False,
-        help="Use model distillation for finetuning dataset extraction.",
+        help="Use model distillation to get code documentation for finetuning dataset extraction.",
+    )
+    parser.add_argument(
+        "--code-distillation",
+        action="store_true",
+        default=False,
+        help="Use model distillation to get fine grained code chunking with explanations for finetuning dataset extraction.",
     )
     parser.add_argument(
         "--format",
         type=str,
         default="conversational",
         help="Format of the finetuning dataset. Supported formats are conversational and alpaca. Default is Conversational format.",
+    )
+    parser.add_argument(
+        "--max-tokens",
+        type=int,
+        default=1024,
+        help="Token limit per code block for distillation dataset extraction. Default is 1024.",
     )
     args = parser.parse_args()
 
@@ -159,10 +173,15 @@ def run():
         spinner.start()
         repo_name = repo.repo_name()
         files = repo.load_files()
-        documents = codeparser.parse_code_files_for_finetuning(files)
+        documents = codeparser.parse_code_files_for_finetuning(files, args.max_tokens)
         spinner.stop()
         dateset_extractor = DatasetExtractor(
-            args.format, args.distillation, documents, config
+            args.format,
+            args.doc_distillation,
+            args.code_distillation,
+            documents,
+            config,
+            args.max_tokens,
         )
         dateset_extractor.export()
         exit()

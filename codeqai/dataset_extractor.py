@@ -10,22 +10,37 @@ class DatasetExtractor:
     def __init__(
         self,
         format: DatasetFormat,
-        distillation: bool,
+        doc_distillation: bool,
+        code_distillation: bool,
         code_snippets: list[dict],
         config,
+        max_tokens,
     ):
         self.format = format
-        self.distillation = distillation
+        self.doc_distillation = doc_distillation
+        self.code_distillation = code_distillation
         self.code_snippets = code_snippets
         self.llm = LLM(
             llm_host=LlmHost[config["llm-host"].upper().replace("-", "_")],
             chat_model=config["chat-model"],
+            max_tokens=max_tokens,
             deployment=(
                 config["model-deployment"] if "model-deployment" in config else None
             ),
         )
 
     def export(self):
+        """
+        Exports the dataset based on the specified format.
+
+        This method checks the format of the dataset and calls the appropriate export method.
+        It also prints messages indicating the progress and completion of the export process.
+
+        Supported formats:
+        - CONVERSATIONAL: Exports to conversational_dataset.json
+        - ALPACA: Exports to alpaca_dataset.json
+        - INSTRUCTION: Exports to instruction_dataset.json
+        """
         print("Exporting dataset...")
         if self.format == DatasetFormat.CONVERSATIONAL.value:
             self.export_conversational()
@@ -38,10 +53,16 @@ class DatasetExtractor:
             print("Dataset exported to instruction_dataset.json")
 
     def export_conversational(self):
+        """
+        Exports the code snippets in a conversational format.
+
+        This method processes each code snippet in the dataset and creates conversational messages
+        for both implementation and explanation tasks. The messages are then saved to a JSON file.
+        """
         messages_list = []
         for code_snippet in self.code_snippets:
             if code_snippet.get("description") is None:
-                if self.distillation:
+                if self.doc_distillation:
                     docstring = self.distill_docstring(code_snippet)
                 else:
                     continue
@@ -85,10 +106,16 @@ class DatasetExtractor:
                 f.write("\n")
 
     def export_alpaca(self):
+        """
+        Exports the code snippets in an Alpaca format.
+
+        This method processes each code snippet in the dataset and creates Alpaca entries
+        for both implementation and explanation tasks. The entries are then saved to a JSON file.
+        """
         alpaca_list = []
         for code_snippet in self.code_snippets:
             if code_snippet.get("description") is None:
-                if self.distillation:
+                if self.doc_distillation:
                     docstring = self.distill_docstring(code_snippet)
                 else:
                     continue
@@ -116,10 +143,16 @@ class DatasetExtractor:
             json.dump(alpaca_list, f, indent=4)
 
     def export_instruction(self):
+        """
+        Exports the code snippets in an instruction format.
+
+        This method processes each code snippet in the dataset and creates instruction entries
+        for both implementation and explanation tasks. The entries are then saved to a JSON file.
+        """
         instructions_list = []
         for code_snippet in self.code_snippets:
             if code_snippet.get("description") is None:
-                if self.distillation:
+                if self.doc_distillation:
                     result = self.distill_docstring(code_snippet)
                     if type(result) is str:
                         docstring = result
@@ -151,10 +184,16 @@ class DatasetExtractor:
             json.dump(instructions_list, f, indent=4)
 
     def export_completion(self):
+        """
+        Exports the code snippets in a completion format.
+
+        This method processes each code snippet in the dataset and creates completion entries.
+        The entries are then saved to a JSON file.
+        """
         completions_list = []
         for code_snippet in self.code_snippets:
             if code_snippet.get("description") is None:
-                if self.distillation:
+                if self.doc_distillation:
                     docstring = self.distill_docstring(code_snippet)
                 else:
                     continue
@@ -171,6 +210,15 @@ class DatasetExtractor:
             json.dump(completions_list, f, indent=4)
 
     def distill_docstring(self, code_snippet):
+        """
+        Distills a concise description from the given code snippet.
+
+        Args:
+            code_snippet (dict): A dictionary containing details about the code snippet, such as method name, programming language, and the actual code.
+
+        Returns:
+            str: A concise description of the code snippet.
+        """
         spinner = yaspin(
             text=f"Distilling {code_snippet.get('method_name')}...",
             color="green",
@@ -179,7 +227,7 @@ class DatasetExtractor:
         prompt = (
             "You are a "
             + (code_snippet.get("language") or "programming")
-            + " expert. Write a short and decent description for the following code. Return only the description."
+            + " expert. Write a short and concise description for the following code. Return only the description."
         )
         docstring = self.llm.chat_model.invoke(
             [
@@ -191,6 +239,15 @@ class DatasetExtractor:
         return docstring.content
 
     def distill_code(self, code_snippet):
+        """
+        Distills a given code snippet into smaller chunks and provides explanations for each chunk.
+
+        Args:
+            code_snippet (dict): A dictionary containing details about the code snippet, such as method name, programming language, and the actual code.
+
+        Returns:
+            dict: A dictionary containing the distilled code chunks and their explanations.
+        """
         spinner = yaspin(
             text=f"Distilling {code_snippet.get('method_name')}...",
             color="green",
@@ -209,4 +266,17 @@ class DatasetExtractor:
             ]
         )
         spinner.stop()
-        return code.content
+
+        try:
+            # Ensure the content is a string before parsing
+            if isinstance(code.content, str):
+                # Parse the output to a JSON object
+                code_json = json.loads(code.content)
+            else:
+                raise ValueError("Content is not a valid JSON string")
+        except (json.JSONDecodeError, ValueError) as e:
+            # Handle JSON parsing error
+            print(f"Error parsing response JSON: {e}")
+            return {}
+
+        return code_json

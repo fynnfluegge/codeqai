@@ -3,7 +3,7 @@ import os
 import inquirer
 from langchain.embeddings.base import Embeddings
 from langchain.schema import Document
-from langchain_community.vectorstores import FAISS
+from langchain_community.vectorstores.faiss import FAISS
 
 from codeqai import utils
 from codeqai.cache import VectorCache, get_cache_path, load_vector_cache
@@ -18,6 +18,12 @@ class VectorStore:
         self.install_faiss()
 
     def load_documents(self):
+        """
+        Loads documents into the vector store.
+
+        This method reads the serialized FAISS index from a file, deserializes it, and loads it into the FAISS database.
+        It also loads the vector cache from a JSON file and initializes the retriever with the specified search parameters.
+        """
         with open(
             os.path.join(get_cache_path(), f"{self.name}.faiss.bytes"), "rb"
         ) as file:
@@ -30,6 +36,15 @@ class VectorStore:
         self.retriever = self.db.as_retriever(search_type="mmr", search_kwargs={"k": 8})
 
     def index_documents(self, documents: list[Document]):
+        """
+        Indexes the given documents and stores them in the vector store.
+
+        This method creates a FAISS index from the provided documents and serializes it to a file.
+        It also creates a vector cache for quick lookup of document vectors and initializes the retriever.
+
+        Args:
+            documents (list[Document]): A list of Document objects to be indexed.
+        """
         self.vector_cache = {}
         self.db = FAISS.from_documents(documents, self.embeddings)
         index = self.db.serialize_to_bytes()
@@ -59,6 +74,17 @@ class VectorStore:
         self.retriever = self.db.as_retriever(search_type="mmr", search_kwargs={"k": 8})
 
     def sync_documents(self, files):
+        """
+        Synchronizes the documents in the vector store with the provided files.
+
+        This method checks if the documents in the vector store are up-to-date with the provided files.
+        If a document has been modified, it deletes the old vectors and adds new vectors.
+        If a document is new, it adds the document to the vector store.
+        It also removes old documents that are no longer present in the provided files.
+
+        Args:
+            files (list[str]): List of file paths to synchronize with the vector store.
+        """
         new_filenames = set()
         for file in files:
             filename = os.path.basename(file)

@@ -3,6 +3,7 @@ import os
 import inquirer
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from yaspin import yaspin
 
 from codeqai import repo, utils
 from codeqai.constants import Language
@@ -69,7 +70,9 @@ def parse_code_files_for_db(code_files: list[str]) -> list[Document]:
     return documents
 
 
-def parse_code_files_for_finetuning(code_files: list[str], max_tokens) -> list[dict]:
+def parse_code_files_for_finetuning(
+    code_files: list[str], max_tokens, spinner
+) -> list[dict]:
     """
     Parses a list of code files for fine-tuning and returns a list of dictionaries containing method information.
 
@@ -116,11 +119,14 @@ def parse_code_files_for_finetuning(code_files: list[str], max_tokens) -> list[d
                     input_tokens += utils.count_tokens(node.doc_comment)
                     output_tokens += max_tokens
 
+    spinner.stop()
+
+    print(f"Estimated input tokens for distillation needed: {input_tokens}.")
+    print(f"Maximum output tokens for distillation nedeed: {output_tokens}.")
     questions = [
         inquirer.Confirm(
             "confirm",
-            message=f"Estimated input tokens for distillation needed: {input_tokens}. "
-            + f"Maximum output tokens nedeed: {output_tokens}. Proceed?",
+            message="Proceed?",
             default=True,
         ),
     ]

@@ -15,7 +15,7 @@ from codeqai import codeparser, repo, utils
 from codeqai.bootstrap import bootstrap
 from codeqai.cache import create_cache_dir, get_cache_path, save_vector_cache
 from codeqai.config import create_config, get_config_path, load_config
-from codeqai.constants import EmbeddingsModel, LlmHost
+from codeqai.constants import DistillationMode, EmbeddingsModel, LlmHost
 from codeqai.dataset_extractor import DatasetExtractor
 from codeqai.embeddings import Embeddings
 from codeqai.vector_store import VectorStore
@@ -89,16 +89,14 @@ def run():
         + "'sync' to sync the vector store with the current git checkout, 'export-dataset' to export a dataset for model distillation.",
     )
     parser.add_argument(
-        "--doc-distillation",
-        action="store_true",
-        default=False,
-        help="Use model distillation to get code documentation for finetuning dataset extraction.",
-    )
-    parser.add_argument(
-        "--code-distillation",
-        action="store_true",
-        default=False,
-        help="Use model distillation to get fine grained code chunking with explanations for finetuning dataset extraction.",
+        "--distillation",
+        type=DistillationMode,
+        default=DistillationMode.NONE,
+        help="Use model distillation for finetuning dataset extraction. Default is None."
+        + "Supported modes are, 'full', 'doc', 'code'.\n"
+        + "doc - Extracts only documentation for distillation.\n"
+        + "code - Extracts will chunk code blocks with inlined comments for distillation.\n"
+        + "full - Uses both doc and code mode",
     )
     parser.add_argument(
         "--format",
@@ -166,6 +164,7 @@ def run():
     )
 
     if args.action == "export-dataset":
+        print(args.distillation)
         spinner = yaspin(
             text=f"Parsing codebase for {args.format} dataset export...",
             color="green",
@@ -173,12 +172,12 @@ def run():
         spinner.start()
         repo_name = repo.repo_name()
         files = repo.load_files()
-        documents = codeparser.parse_code_files_for_finetuning(files, args.max_tokens)
-        spinner.stop()
+        documents = codeparser.parse_code_files_for_finetuning(
+            files, args.max_tokens, spinner
+        )
         dateset_extractor = DatasetExtractor(
             args.format,
-            args.doc_distillation,
-            args.code_distillation,
+            args.distillation,
             documents,
             config,
             args.max_tokens,

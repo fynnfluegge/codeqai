@@ -2,7 +2,7 @@ import json
 
 from yaspin import yaspin
 
-from codeqai.constants import DatasetFormat, LlmHost
+from codeqai.constants import DatasetFormat, DistillationMode, LlmHost
 from codeqai.llm import LLM
 
 
@@ -10,15 +10,13 @@ class DatasetExtractor:
     def __init__(
         self,
         format: DatasetFormat,
-        doc_distillation: bool,
-        code_distillation: bool,
+        distillation_mode: DistillationMode,
         code_snippets: list[dict],
         config,
         max_tokens,
     ):
         self.format = format
-        self.doc_distillation = doc_distillation
-        self.code_distillation = code_distillation
+        self.distillation_mode = distillation_mode
         self.code_snippets = code_snippets
         self.llm = LLM(
             llm_host=LlmHost[config["llm-host"].upper().replace("-", "_")],
@@ -51,6 +49,9 @@ class DatasetExtractor:
         elif self.format == DatasetFormat.INSTRUCTION.value:
             self.export_instruction()
             print("Dataset exported to instruction_dataset.json")
+        elif self.format == DatasetFormat.COMPLETION.value:
+            self.export_completion()
+            print("Dataset exported to completion_dataset.json")
 
     def export_conversational(self):
         """
@@ -62,12 +63,22 @@ class DatasetExtractor:
         messages_list = []
         for code_snippet in self.code_snippets:
             if code_snippet.get("description") is None:
-                if self.doc_distillation:
+                if (
+                    self.distillation_mode == DistillationMode.DOCUMENTATION
+                    or self.distillation_mode == DistillationMode.FULL
+                ):
                     docstring = self.distill_docstring(code_snippet)
                 else:
                     continue
             else:
                 docstring = code_snippet.get("description")
+
+            if (
+                self.distillation_mode == DistillationMode.CODE
+                or self.distillation_mode == DistillationMode.FULL
+            ):
+                pass
+
             message = {
                 "messages": [
                     {
@@ -115,12 +126,21 @@ class DatasetExtractor:
         alpaca_list = []
         for code_snippet in self.code_snippets:
             if code_snippet.get("description") is None:
-                if self.doc_distillation:
+                if (
+                    self.distillation_mode == DistillationMode.DOCUMENTATION
+                    or self.distillation_mode == DistillationMode.FULL
+                ):
                     docstring = self.distill_docstring(code_snippet)
                 else:
                     continue
             else:
                 docstring = code_snippet.get("description")
+
+            if (
+                self.distillation_mode == DistillationMode.CODE
+                or self.distillation_mode == DistillationMode.FULL
+            ):
+                pass
 
             alpaca_entry = {
                 "instruction": "You are a "
@@ -152,7 +172,10 @@ class DatasetExtractor:
         instructions_list = []
         for code_snippet in self.code_snippets:
             if code_snippet.get("description") is None:
-                if self.doc_distillation:
+                if (
+                    self.distillation_mode == DistillationMode.DOCUMENTATION
+                    or self.distillation_mode == DistillationMode.FULL
+                ):
                     result = self.distill_docstring(code_snippet)
                     if type(result) is str:
                         docstring = result
@@ -162,6 +185,12 @@ class DatasetExtractor:
                     continue
             else:
                 docstring = code_snippet.get("description")
+
+            if (
+                self.distillation_mode == DistillationMode.CODE
+                or self.distillation_mode == DistillationMode.FULL
+            ):
+                pass
 
             instruction = {
                 "prompt": "You are a "
@@ -193,12 +222,21 @@ class DatasetExtractor:
         completions_list = []
         for code_snippet in self.code_snippets:
             if code_snippet.get("description") is None:
-                if self.doc_distillation:
+                if (
+                    self.distillation_mode == DistillationMode.DOCUMENTATION
+                    or self.distillation_mode == DistillationMode.FULL
+                ):
                     docstring = self.distill_docstring(code_snippet)
                 else:
                     continue
             else:
                 docstring = code_snippet.get("description")
+
+            if (
+                self.distillation_mode == DistillationMode.CODE
+                or self.distillation_mode == DistillationMode.FULL
+            ):
+                pass
 
             completion = {
                 "input": docstring,

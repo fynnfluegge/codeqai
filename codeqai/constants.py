@@ -43,3 +43,10 @@ class DatasetFormat(Enum):
     CONVERSATIONAL = "conversational"
     INSTRUCTION = "instruction"
     COMPLETION = "completion"
+
+
+class DistillationMode(Enum):
+    NONE = "none"
+    FULL = "full"
+    DOCUMENTATION = "doc"
+    CODE = "code"

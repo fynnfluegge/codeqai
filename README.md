@@ -20,7 +20,7 @@ Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](
 ## ✨ Features
 
 - 🗒️ &nbsp;Finetuning dataset generation
-  -
+  - export in Alpaca, conversational, instruction or completionn format 
 - 🔎 &nbsp;Semantic code search
 - 💬 &nbsp;GPT-like chat with your codebase
 - ⚙️ &nbsp;Synchronize vector store and latest code changes with ease

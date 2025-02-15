@@ -8,6 +8,18 @@ from codeqai.constants import EmbeddingsModel, LlmHost
 
 
 def get_config_path():
+    """
+    Returns the configuration file path based on the operating system.
+
+    This function determines the appropriate configuration directory based on the operating system
+    and constructs the full path to the configuration file.
+
+    Returns:
+        str: The path to the configuration file.
+
+    Raises:
+        NotImplementedError: If the operating system is not supported.
+    """
     system = platform.system()
 
     if system == "Linux" or system == "Darwin":
@@ -25,17 +37,44 @@ def get_config_path():
 
 
 def load_config():
+    """
+    Loads the configuration from the configuration file.
+
+    This function reads the configuration file specified by get_config_path() and parses its content
+    using the YAML parser.
+
+    Returns:
+        dict: The configuration dictionary loaded from the file.
+    """
     with open(get_config_path(), "r", encoding="utf-8") as config_file:
         config = yaml.safe_load(config_file)
     return config
 
 
 def save_config(config):
+    """
+    Saves the configuration to the configuration file.
+
+    Args:
+        config (dict): The configuration dictionary to be saved.
+
+    This function writes the provided configuration dictionary to the configuration file specified by get_config_path()
+    using the YAML format.
+    """
     with open(get_config_path(), "w", encoding="utf-8") as config_file:
         yaml.dump(config, config_file, default_flow_style=False)
 
 
 def create_config():
+    """
+    Creates a new configuration interactively by prompting the user for input.
+
+    This function prompts the user with a series of questions to configure the embeddings model and LLM host.
+    Based on the user's responses, it constructs a configuration dictionary and saves it to the configuration file.
+
+    Returns:
+        dict: The configuration dictionary created based on user input.
+    """
     os.makedirs(os.path.dirname(get_config_path()), exist_ok=True)
 
     questions = [

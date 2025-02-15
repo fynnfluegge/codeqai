@@ -39,5 +39,14 @@ class LlmHost(Enum):
 
 
 class DatasetFormat(Enum):
-    ALPACA = "Alpaca"
-    CONVERSATIONAL = "Conversational"
+    ALPACA = "alpaca"
+    CONVERSATIONAL = "conversational"
+    INSTRUCTION = "instruction"
+    COMPLETION = "completion"
+
+
+class DistillationMode(Enum):
+    NONE = "none"
+    FULL = "full"
+    DOCUMENTATION = "doc"
+    CODE = "code"

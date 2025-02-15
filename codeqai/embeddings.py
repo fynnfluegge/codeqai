@@ -1,5 +1,5 @@
 import inquirer
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_huggingface import HuggingFaceEmbeddings
 from langchain_openai import AzureOpenAIEmbeddings, OpenAIEmbeddings
 
 from codeqai import utils
@@ -12,12 +12,21 @@ class Embeddings:
         model=EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002,
         deployment=None,
     ):
+        """
+        Initializes the Embeddings class with the specified model and deployment.
+
+        Args:
+            model (EmbeddingsModel): The embeddings model to use. Defaults to OPENAI_TEXT_EMBEDDING_ADA_002.
+            deployment (str, optional): The deployment name for Azure OpenAI embeddings. Defaults to None.
+        """
         if model == EmbeddingsModel.OPENAI_TEXT_EMBEDDING_ADA_002:
             self.embeddings = OpenAIEmbeddings(
                 client=None, model="text-embedding-ada-002"
             )
         elif model == EmbeddingsModel.AZURE_OPENAI and deployment:
-            self.embeddings = AzureOpenAIEmbeddings(client=None, deployment=deployment)
+            self.embeddings = AzureOpenAIEmbeddings(
+                client=None, azure_deployment=deployment
+            )
         else:
             try:
                 import sentence_transformers  # noqa: F401

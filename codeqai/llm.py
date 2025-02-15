@@ -6,19 +6,32 @@ import inquirer
 from langchain.callbacks.manager import CallbackManager
 from langchain.callbacks.streaming_stdout import StreamingStdOutCallbackHandler
 from langchain_anthropic import ChatAnthropic
-from langchain_community.chat_models import AzureChatOpenAI
 from langchain_community.llms import LlamaCpp, Ollama
-from langchain_openai import ChatOpenAI
+from langchain_openai import AzureChatOpenAI, ChatOpenAI
 
 from codeqai import utils
 from codeqai.constants import LlmHost
 
 
 class LLM:
-    def __init__(self, llm_host: LlmHost, chat_model: str, deployment=None):
+    def __init__(
+        self, llm_host: LlmHost, chat_model: str, max_tokens=2048, deployment=None
+    ):
+        """
+        Initializes the LLM class with the specified parameters.
+
+        Args:
+            llm_host (LlmHost): The host for the language model (e.g., OPENAI, AZURE_OPENAI, ANTHROPIC, LLAMACPP, OLLAMA).
+            chat_model (str): The chat model to use.
+            max_tokens (int, optional): The maximum number of tokens for the model. Defaults to 2048.
+            deployment (str, optional): The deployment name for Azure OpenAI. Defaults to None.
+
+        Raises:
+            ValueError: If the required environment variable for Azure OpenAI is not set.
+        """
         if llm_host == LlmHost.OPENAI:
             self.chat_model = ChatOpenAI(
-                temperature=0.9, max_tokens=2048, model=chat_model
+                temperature=0.9, max_tokens=max_tokens, model=chat_model
             )
         elif llm_host == LlmHost.AZURE_OPENAI and deployment:
             azure_openai_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT")
@@ -26,8 +39,7 @@ class LLM:
                 self.chat_model = AzureChatOpenAI(
                     azure_endpoint=azure_openai_endpoint,
                     temperature=0.9,
-                    max_tokens=2048,
-                    deployment_name=deployment,
+                    max_tokens=max_tokens,
                     model=chat_model,
                 )
             else:
@@ -36,14 +48,18 @@ class LLM:
                 )
         elif llm_host == LlmHost.ANTHROPIC:
             self.chat_model = ChatAnthropic(
-                temperature=0.9, max_tokens=2048, model_name=chat_model
+                temperature=0.9,
+                max_tokens_to_sample=max_tokens,
+                model_name=chat_model,
+                timeout=30,
+                api_key=None,  # API key is set to environment variable ANTHROPIC_API_KEY
             )
         elif llm_host == LlmHost.LLAMACPP:
             self.install_llama_cpp()
             self.chat_model = LlamaCpp(
                 model_path=chat_model,
                 temperature=0.9,
-                max_tokens=2048,
+                max_tokens=max_tokens,
                 verbose=False,
             )
         elif llm_host == LlmHost.OLLAMA:

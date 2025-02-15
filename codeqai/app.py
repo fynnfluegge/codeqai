@@ -15,7 +15,8 @@ from codeqai import codeparser, repo, utils
 from codeqai.bootstrap import bootstrap
 from codeqai.cache import create_cache_dir, get_cache_path, save_vector_cache
 from codeqai.config import create_config, get_config_path, load_config
-from codeqai.constants import EmbeddingsModel, LlmHost
+from codeqai.constants import DistillationMode, EmbeddingsModel, LlmHost
+from codeqai.dataset_extractor import DatasetExtractor
 from codeqai.embeddings import Embeddings
 from codeqai.vector_store import VectorStore
 
@@ -81,20 +82,33 @@ def run():
             "chat",
             "configure",
             "sync",
-            "export-dataset (experimental)",
+            "dataset",
         ],
-        help="Action to perform. 'search' will semantically search the codebase. 'chat' will chat with the codebase.",
+        help="Action to perform. 'app' to start the streamlit app, 'search' to search the codebase, "
+        + "'chat' to chat with the model, 'configure' to start config wizard, "
+        + "'sync' to sync the vector store with the current git checkout, 'dataset' to export a dataset for model distillation.",
     )
     parser.add_argument(
         "--distillation",
-        action="store_true",
-        help="Use model distillation for finetuning dataset extraction.",
+        type=DistillationMode,
+        default=DistillationMode.NONE,
+        help="Use model distillation for finetuning dataset extraction. Default is None."
+        + "Supported modes are, 'full', 'doc', 'code'.\n"
+        + "doc - Extracts only documentation for distillation.\n"
+        + "code - Extracts will chunk code blocks with inlined comments for distillation.\n"
+        + "full - Uses both doc and code mode",
     )
     parser.add_argument(
         "--format",
         type=str,
-        default="Conversational",
-        help="Format of the finetuning dataset. Supported formats are Conversational and Alpaca. Default is Conversational format.",
+        default="conversational",
+        help="Format of the finetuning dataset. Supported formats are conversational and alpaca. Default is Conversational format.",
+    )
+    parser.add_argument(
+        "--max-tokens",
+        type=int,
+        default=1024,
+        help="Token limit per code block for distillation dataset extraction. Default is 1024.",
     )
     args = parser.parse_args()
 
@@ -149,10 +163,26 @@ def run():
         ),
     )
 
-    if args.action == "extract-dataset":
+    if args.action == "dataset":
+        print(args.distillation)
+        spinner = yaspin(
+            text=f"Parsing codebase for {args.format} dataset export...",
+            color="green",
+        )
+        spinner.start()
         repo_name = repo.repo_name()
         files = repo.load_files()
-        documents = codeparser.parse_code_files_for_finetuning(files)
+        documents = codeparser.parse_code_files_for_finetuning(
+            files, args.max_tokens, spinner
+        )
+        dateset_extractor = DatasetExtractor(
+            args.format,
+            args.distillation,
+            documents,
+            config,
+            args.max_tokens,
+        )
+        dateset_extractor.export()
         exit()
 
     # check if faiss.index exists

@@ -27,6 +27,15 @@ class VectorCache:
 
 
 def load_vector_cache(filename) -> Dict[str, VectorCache]:
+    """
+    Loads a vector cache from a JSON file.
+
+    Args:
+        filename (str): The name of the file containing the vector cache.
+
+    Returns:
+        Dict[str, VectorCache]: A dictionary where the keys are strings and the values are VectorCache objects.
+    """
     with open(
         get_cache_path() + "/" + filename, "r", encoding="utf-8"
     ) as vector_cache_file:
@@ -38,6 +47,13 @@ def load_vector_cache(filename) -> Dict[str, VectorCache]:
 
 
 def save_vector_cache(vector_cache, filename):
+    """
+    Saves a vector cache to a JSON file.
+
+    Args:
+        vector_cache (Dict[str, VectorCache]): A dictionary where the keys are strings and the values are VectorCache objects.
+        filename (str): The name of the file to save the vector cache to.
+    """
     with open(
         get_cache_path() + "/" + filename, "w", encoding="utf-8"
     ) as vector_cache_file:
@@ -45,6 +61,15 @@ def save_vector_cache(vector_cache, filename):
 
 
 def get_cache_path():
+    """
+    Returns the cache directory path based on the operating system.
+
+    Returns:
+        str: The path to the cache directory.
+
+    Raises:
+        NotImplementedError: If the operating system is not supported.
+    """
     system = platform.system()
 
     if system == "Linux" or system == "Darwin":
@@ -60,6 +85,12 @@ def get_cache_path():
 
 
 def create_cache_dir():
+    """
+    Creates the cache directory if it does not already exist.
+
+    This function checks if the cache directory exists at the path returned by get_cache_path().
+    If the directory does not exist, it creates the directory and any necessary parent directories.
+    """
     if not os.path.exists(get_cache_path()):
         path = Path(get_cache_path())
         path.mkdir(parents=True, exist_ok=True)

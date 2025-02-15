@@ -10,7 +10,7 @@
 
 <div align="center">
 
-Search your codebase semantically or chat with it from cli. Keep the vector database superfast up to date to the latest code changes.
+Generate datasets from code for finetuning, search your codebase semantically or chat with your code from cli. Keep the vector database superfast up to date to the latest code changes.
 100% local support without any dataleaks.  
 Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](https://github.com/tree-sitter/tree-sitter), [sentence-transformers](https://github.com/UKPLab/sentence-transformers), [instructor-embedding](https://github.com/xlang-ai/instructor-embedding),
 [faiss](https://github.com/facebookresearch/faiss), [lama.cpp](https://github.com/ggerganov/llama.cpp), [Ollama](https://github.com/jmorganca/ollama), [Streamlit](https://github.com/streamlit/streamlit).
@@ -19,6 +19,8 @@ Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](
 
 ## ✨ Features
 
+- 🗒️ &nbsp;Finetuning dataset generation
+  - export in Alpaca, conversational, instruction or completionn format 
 - 🔎 &nbsp;Semantic code search
 - 💬 &nbsp;GPT-like chat with your codebase
 - ⚙️ &nbsp;Synchronize vector store and latest code changes with ease
@@ -31,6 +33,19 @@ Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](
 > There will be better results if the code is well documented. You might consider [doc-comments-ai](https://github.com/fynnfluegge/doc-comments.ai) for code documentation generation.
 
 ## 🚀 Usage
+
+#### Export finetuning dataset from codebase in conversational format:
+```
+codeqai dataset
+```
+Export in different format like Alpaca with:
+```
+codeqai dataset --format alpaca
+```
+Export dataset with model distillation
+```
+codeqai dataset --distillation doc
+```
 
 #### Start semantic search:
 

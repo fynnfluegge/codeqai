@@ -7,9 +7,7 @@ from codeqai.treesitter.treesitter_registry import TreesitterRegistry
 
 class TreesitterRuby(Treesitter):
     def __init__(self):
-        super().__init__(
-            Language.RUBY, "method", "identifier", "comment"
-        )
+        super().__init__(Language.RUBY, "method", "identifier", "comment")
 
     def parse(self, file_bytes: bytes) -> list[TreesitterMethodNode]:
         return super().parse(file_bytes)
@@ -18,13 +16,23 @@ class TreesitterRuby(Treesitter):
         self,
         node: tree_sitter.Node,
     ):
+        """
+        Recursively queries all method nodes in the given syntax tree node.
+
+        Args:
+            node (tree_sitter.Node): The root node to start the query from.
+
+        Returns:
+            list: A list of dictionaries, each containing a method node and its associated doc comment (if any).
+        """
         methods = []
         if node.type == self.method_declaration_identifier:
             doc_comment = []
             doc_comment_node = node
             while (
                 doc_comment_node.prev_named_sibling
-                and doc_comment_node.prev_named_sibling.type == self.doc_comment_identifier
+                and doc_comment_node.prev_named_sibling.type
+                == self.doc_comment_identifier
             ):
                 doc_comment_node = doc_comment_node.prev_named_sibling
                 doc_comment.insert(0, doc_comment_node.text.decode())
@@ -33,6 +41,7 @@ class TreesitterRuby(Treesitter):
             for child in node.children:
                 methods.extend(self._query_all_methods(child))
         return methods
+
 
 # Register the TreesitterRuby class in the registry
 TreesitterRegistry.register_treesitter(Language.RUBY, TreesitterRuby)

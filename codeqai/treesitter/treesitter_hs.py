@@ -1,5 +1,3 @@
-from typing import Dict, List
-
 import tree_sitter
 
 from codeqai.constants import Language
@@ -12,6 +10,15 @@ class TreesitterHaskell(Treesitter):
         super().__init__(Language.HASKELL, "function", "variable", "comment")
 
     def parse(self, file_bytes: bytes) -> list[TreesitterMethodNode]:
+        """
+        Parses the given file bytes and extracts method nodes.
+
+        Args:
+            file_bytes (bytes): The content of the file to be parsed.
+
+        Returns:
+            list[TreesitterMethodNode]: A list of TreesitterMethodNode objects representing the methods in the file.
+        """
         self.tree = self.parser.parse(file_bytes)
         result = []
         methods = self._query_all_methods(self.tree.root_node)
@@ -36,6 +43,15 @@ class TreesitterHaskell(Treesitter):
         self,
         node: tree_sitter.Node,
     ):
+        """
+        Recursively queries all method nodes in the given syntax tree node.
+
+        Args:
+            node (tree_sitter.Node): The root node to start the query from.
+
+        Returns:
+            list: A list of dictionaries, each containing a method node and its associated doc comment (if any).
+        """
         methods = []
         if node.type == self.method_declaration_identifier:
             doc_comment_node = None
@@ -79,6 +95,15 @@ class TreesitterHaskell(Treesitter):
         return methods
 
     def _query_method_name(self, node: tree_sitter.Node):
+        """
+        Queries the method name from the given syntax tree node.
+
+        Args:
+            node (tree_sitter.Node): The syntax tree node to query.
+
+        Returns:
+            str or None: The method name if found, otherwise None.
+        """
         if node.type == "signature" or node.type == self.method_declaration_identifier:
             for child in node.children:
                 if child.type == self.method_name_identifier:

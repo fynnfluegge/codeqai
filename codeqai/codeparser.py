@@ -1,8 +1,9 @@
-import ast
 import os
 
+import inquirer
 from langchain.schema import Document
 from langchain.text_splitter import RecursiveCharacterTextSplitter
+from yaspin import yaspin
 
 from codeqai import repo, utils
 from codeqai.constants import Language
@@ -10,6 +11,15 @@ from codeqai.treesitter.treesitter import Treesitter, TreesitterMethodNode
 
 
 def parse_code_files_for_db(code_files: list[str]) -> list[Document]:
+    """
+    Parses a list of code files and returns a list of Document objects for database storage.
+
+    Args:
+        code_files (list[str]): List of paths to code files to be parsed.
+
+    Returns:
+        list[Document]: List of Document objects containing parsed code information.
+    """
     documents = []
     code_splitter = None
     for code_file in code_files:
@@ -60,7 +70,21 @@ def parse_code_files_for_db(code_files: list[str]) -> list[Document]:
     return documents
 
 
-def parse_code_files_for_finetuning(code_files: list[str]) -> list[dict]:
+def parse_code_files_for_finetuning(
+    code_files: list[str], max_tokens, spinner
+) -> list[dict]:
+    """
+    Parses a list of code files for fine-tuning and returns a list of dictionaries containing method information.
+
+    Args:
+        code_files (list[str]): List of paths to code files to be parsed.
+        max_tokens (int): Maximum number of tokens allowed for output.
+
+    Returns:
+        list[dict]: List of dictionaries containing method information, including method name, code, description, and language.
+    """
+    input_tokens = 0
+    output_tokens = 0
     documents = []
     for code_file in code_files:
         with open(code_file, "r", encoding="utf-8") as file:
@@ -84,10 +108,34 @@ def parse_code_files_for_finetuning(code_files: list[str]) -> list[dict]:
                     )
 
                 document = {
+                    "method_name": node.name,
                     "code": method_source_code,
                     "description": node.doc_comment,
-                    "language": programming_language,
+                    "language": programming_language.value,
                 }
                 documents.append(document)
+
+                if node.doc_comment is not None:
+                    input_tokens += utils.count_tokens(node.doc_comment)
+                    output_tokens += max_tokens
+
+    spinner.stop()
+
+    print(f"Estimated input tokens for distillation needed: {input_tokens}.")
+    print(f"Maximum output tokens for distillation nedeed: {output_tokens}.")
+    questions = [
+        inquirer.Confirm(
+            "confirm",
+            message="Proceed?",
+            default=True,
+        ),
+    ]
+
+    confirm = inquirer.prompt(questions)
+
+    if confirm and confirm["confirm"]:
+        pass
+    else:
+        exit()
 
     return documents

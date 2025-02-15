@@ -34,6 +34,19 @@ Built with [langchain](https://github.com/langchain-ai/langchain), [treesitter](
 
 ## 🚀 Usage
 
+#### Export finetuning dataset from codebase in conversational format:
+```
+codeqai dataset
+```
+Export in different format like Alpaca with:
+```
+codeqai dataset --format alpaca
+```
+Export dataset with model distillation
+```
+codeqai dataset --distillation doc
+```
+
 #### Start semantic search:
 
 ```

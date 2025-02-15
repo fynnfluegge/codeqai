@@ -82,11 +82,11 @@ def run():
             "chat",
             "configure",
             "sync",
-            "export-dataset",
+            "dataset",
         ],
         help="Action to perform. 'app' to start the streamlit app, 'search' to search the codebase, "
         + "'chat' to chat with the model, 'configure' to start config wizard, "
-        + "'sync' to sync the vector store with the current git checkout, 'export-dataset' to export a dataset for model distillation.",
+        + "'sync' to sync the vector store with the current git checkout, 'dataset' to export a dataset for model distillation.",
     )
     parser.add_argument(
         "--distillation",
@@ -163,7 +163,7 @@ def run():
         ),
     )
 
-    if args.action == "export-dataset":
+    if args.action == "dataset":
         print(args.distillation)
         spinner = yaspin(
             text=f"Parsing codebase for {args.format} dataset export...",

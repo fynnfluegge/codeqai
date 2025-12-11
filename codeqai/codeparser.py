@@ -23,7 +23,7 @@ def parse_code_files_for_db(code_files: list[str]) -> list[Document]:
     documents = []
     code_splitter = None
     for code_file in code_files:
-        with open(code_file, "r", encoding="utf-8") as file:
+        with open(code_file, "r", encoding="utf-8", errors="replace") as file:
             file_bytes = file.read().encode()
             commit_hash = repo.get_commit_hash(code_file)
 
@@ -87,7 +87,7 @@ def parse_code_files_for_finetuning(
     output_tokens = 0
     documents = []
     for code_file in code_files:
-        with open(code_file, "r", encoding="utf-8") as file:
+        with open(code_file, "r", encoding="utf-8", errors="replace") as file:
             file_bytes = file.read().encode()
 
             file_extension = utils.get_file_extension(code_file)

@@ -123,6 +123,7 @@ BLACKLIST_DIR = [
     "cdk.out",
     ".aws-sam",
     ".terraform",
+    "vendor",
 ]
 WHITELIST_FILES = [
     ".js",

@@ -35,6 +35,7 @@ def get_programming_language(file_extension: str) -> Language:
         ".cs": Language.C_SHARP,
         ".hs": Language.HASKELL,
         ".rb": Language.RUBY,
+        ".php": Language.PHP,
     }
     return language_mapping.get(file_extension, Language.UNKNOWN)
 
@@ -76,6 +77,8 @@ def get_langchain_language(language: Language):
         return text_splitter.Language.HASKELL
     elif language == Language.RUBY:
         return text_splitter.Language.RUBY
+    elif language == Language.PHP:
+        return text_splitter.Language.PHP
     else:
         return None
 

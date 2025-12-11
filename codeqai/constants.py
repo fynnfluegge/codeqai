@@ -17,6 +17,7 @@ class Language(Enum):
     LUA = "lua"
     HASKELL = "haskell"
     RUBY = "ruby"
+    PHP = "php"
     UNKNOWN = "unknown"
 
 

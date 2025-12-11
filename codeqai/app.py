@@ -8,6 +8,7 @@ from dotenv import dotenv_values, load_dotenv
 from rich.console import Console
 from rich.markdown import Markdown
 from rich.syntax import Syntax
+from pygments.lexers import PhpLexer
 from streamlit.web import cli as stcli
 from yaspin import yaspin
 
@@ -15,7 +16,7 @@ from codeqai import codeparser, repo, utils
 from codeqai.bootstrap import bootstrap
 from codeqai.cache import create_cache_dir, get_cache_path, save_vector_cache
 from codeqai.config import create_config, get_config_path, load_config
-from codeqai.constants import DistillationMode, EmbeddingsModel, LlmHost
+from codeqai.constants import DistillationMode, EmbeddingsModel, Language, LlmHost
 from codeqai.dataset_extractor import DatasetExtractor
 from codeqai.embeddings import Embeddings
 from codeqai.vector_store import VectorStore
@@ -243,14 +244,26 @@ def run():
                         doc.metadata["filename"], doc.page_content
                     )
 
-                    syntax = Syntax(
-                        indentation + doc.page_content,
-                        language.value,
-                        theme="monokai",
-                        line_numbers=True,
-                        start_line=start_line,
-                        indent_guides=True,
-                    )
+                    # PHP needs startinline=True since code snippets don't have <?php tag
+                    if language == Language.PHP:
+                        lexer = PhpLexer(startinline=True)
+                        syntax = Syntax(
+                            indentation + doc.page_content,
+                            lexer=lexer,
+                            theme="monokai",
+                            line_numbers=True,
+                            start_line=start_line,
+                            indent_guides=True,
+                        )
+                    else:
+                        syntax = Syntax(
+                            indentation + doc.page_content,
+                            language.value,
+                            theme="monokai",
+                            line_numbers=True,
+                            start_line=start_line,
+                            indent_guides=True,
+                        )
                     print(
                         doc.metadata["filename"] + " -> " + doc.metadata["method_name"]
                     )
